@@ -1,0 +1,14 @@
+%section.album-info
+  %h3= link_to @album.artist, albums_path(search: @album.artist)
+  %h2= @album.title 
+  
+  .details
+    #{@album.label}, #{@album.catnum}, #{@album.year}.
+  
+%section.album-buttons
+  = link_to "Info", @album.info_url, class: 'pure-button' if @album.info_url
+  = link_to "Play", @album.download_url, class: 'pure-button pure-button-primary' if @album.download_url
+    
+%section.album-comments
+  %h3 Recenzije
+
