@@ -31,6 +31,7 @@ gem "google-api-client"
 
 gem "nokogiri"
 gem 'kaminari'
+gem 'activerecord-import'
 
 gem 'watir-webdriver'
 

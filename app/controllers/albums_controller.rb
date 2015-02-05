@@ -13,6 +13,6 @@ class AlbumsController < ApplicationController
   
   def random
     #.of_interest -> .downloaded
-    redirect_to Album.of_interest.order("RAND()").first # for Postgres use RANDOM()
+    redirect_to Album.of_interest.random
   end
 end

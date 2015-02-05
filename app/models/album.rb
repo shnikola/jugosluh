@@ -4,8 +4,9 @@ class Album < ActiveRecord::Base
   scope :of_interest, -> { original.where(in_yu: true) }
   scope :downloaded, -> { where("download_url IS NOT NULL") }
   
-  def self.stats
-    { listened: 0, downloaded: downloaded.count, found: of_interest.count }
+  def self.random
+    random_func = Rails.env.production? ? "RANDOM()" : "RAND()"
+    order(random_func).first
   end
   
   def self.search(query)
