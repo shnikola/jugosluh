@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150204041756) do
+ActiveRecord::Schema.define(version: 20150205032545) do
 
   create_table "albums", force: true do |t|
     t.string  "label"
@@ -46,10 +46,12 @@ ActiveRecord::Schema.define(version: 20150204041756) do
   end
 
   create_table "user_ratings", force: true do |t|
-    t.integer "user_id"
-    t.integer "album_id"
-    t.integer "rating"
-    t.text    "comment"
+    t.integer  "user_id"
+    t.integer  "album_id"
+    t.integer  "rating"
+    t.text     "comment"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   add_index "user_ratings", ["album_id"], name: "index_user_ratings_on_album_id", using: :btree

@@ -1,5 +1,6 @@
 class Album < ActiveRecord::Base
-    
+  has_many :user_ratings
+  
   scope :original, -> { where(duplicate_of_id: nil) }
   scope :of_interest, -> { original.where(in_yu: true) }
   scope :downloaded, -> { where("download_url IS NOT NULL") }
@@ -53,6 +54,10 @@ class Album < ActiveRecord::Base
   
   def self.find_original_by_catnum(catnum)
     find_by_catnum(catnum.strip.gsub(/[\s-]+/, "-").upcase).try(:original)
+  end
+  
+  def to_s
+    "#{artist} - #{title}"
   end
   
   def folder_name

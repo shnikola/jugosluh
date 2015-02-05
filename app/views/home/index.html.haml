@@ -16,4 +16,8 @@
   = link_to "pretraži", albums_path, class: 'tag-link'
 
 %section.latest-comments
-  %h3 Najnoviji komentari
+  %h3 Najsvježiji komentari
+
+  - @user_ratings.each do |user_rating|
+    = render user_rating
+    .user-rating-location za #{link_to user_rating.album, user_rating.album}

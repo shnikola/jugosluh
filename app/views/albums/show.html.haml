@@ -12,3 +12,7 @@
 %section.album-comments
   %h3 Recenzije
 
+  - @album.user_ratings.includes(:user).each do |user_rating|
+    = render user_rating
+  
+    
