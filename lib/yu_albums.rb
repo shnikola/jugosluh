@@ -19,6 +19,20 @@ module YuAlbums
     end
   end
   
+  def self.fix
+    Album.where(duplicate_of_id: nil).find_each do |album|
+      old_id = album.id
+      best_duplicate = Album.where(duplicate_of_id: old_id).where("year > 0 AND year < ?", album.year).order("year ASC").first
+      next if best_duplicate.nil?
+      temp_id = best_duplicate.id
+      album.id = 0; album.save
+      best_duplicate.id = old_id; best_duplicate.tracks = album.tracks; best_duplicate.duplicate_of_id = nil
+      best_duplicate.save
+      album.id = temp_id; album.duplicate_of_id = old_id
+      album.save
+    end
+  end
+  
   def self.load_to_db
     fetch_all do |release|
       begin

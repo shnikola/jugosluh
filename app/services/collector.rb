@@ -9,7 +9,7 @@ class Collector
   end
   
   def crawl(&block)
-    smboemi
+    smboemi(&block)
   end
   
   def catnum_guess(details)

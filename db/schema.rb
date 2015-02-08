@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150205032545) do
+ActiveRecord::Schema.define(version: 20150207134702) do
 
   create_table "albums", force: true do |t|
     t.string  "label"
@@ -38,11 +38,11 @@ ActiveRecord::Schema.define(version: 20150205032545) do
     t.string   "catnum"
     t.text     "details"
     t.string   "download_url"
-    t.boolean  "in_yu",                  default: true
+    t.boolean  "in_yu",        default: true
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "album_id"
-    t.integer  "downloaded",   limit: 1, default: 0
+    t.integer  "status",       default: 0
   end
 
   create_table "user_ratings", force: true do |t|

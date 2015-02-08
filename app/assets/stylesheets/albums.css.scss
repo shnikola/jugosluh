@@ -1,0 +1,22 @@
+.albums-page {
+  
+  .albums {
+  
+    table {
+      width: 80%;
+      margin: auto;
+    }
+  
+    .catnum, .label { word-break: keep-all; white-space: nowrap; }
+
+    .pagination {
+      margin: 20px 0;
+    }
+  
+  }
+}
+
+.album-page {
+  
+  h4 { margin: 15px 0 5px 0;}
+}

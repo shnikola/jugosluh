@@ -1,0 +1,26 @@
+.home-page {
+  
+  .stats {
+
+  }
+
+  .start-actions {
+    .or { margin: 15px 0;}
+  
+    .tag-link { 
+      margin: 0 5px;
+      padding: 5px 10px;
+      background: #eee;
+      text-decoration: none;
+    }
+  }
+  
+  .latest-comments {
+    .user-rating { margin-bottom: 5px;}
+    .user-rating-location {
+      font-size: 12px;
+      margin-bottom: 20px;
+    }
+  }
+  
+}

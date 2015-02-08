@@ -7,14 +7,30 @@ class Downloader
   
   def start(from_id = nil)
     Source.to_download.where("id >= ?", from_id || 0).find_each do |source|
-      next if source.album.uploaded? || Source.where(album_id: source.album_id).count > 1
-      if file_name = get_file(source.download_url)
-        folder = extract_file(source.album, file_name)
-        p "OK: [#{source.album_id}] #{source.album.artist} - #{source.album.title} : #{file_name}"
-        source.update_attributes(downloaded: true)
-      else
-        p "Failed: [#{source.album_id}] #{source.album.artist} - #{source.album.title}"
+      if source.album.uploaded?
+        # Maybe track it somehow?
+        next
       end
+      
+      if Source.where(album_id: source.album_id).count > 1
+        source.multiple_found!
+      end
+      
+      file_name = get_file(source.download_url)
+      
+      if file_name
+        folder = extract_file(source, file_name)
+        source.downloaded! unless source.multiple_found?
+        p "OK: [#{source.album_id}] #{source.album} : #{file_name}"
+      else
+        source.download_failed!
+      end
+      
+      if source.downloaded? && track_count_mismatch?(source, folder)
+        source.download_mismatch!
+      end
+      
+      source.save
     end
   end
   
@@ -24,8 +40,9 @@ class Downloader
     send(:"get_#{host}", url)
   end
   
-  def extract_file(album, file)
-    folder = "#{download_path}/#{album.id}"
+  def extract_file(source, file)
+    folder = "#{download_path}/#{source.album_id}"
+    folder += "_m_#{source.id}" 
     Dir.mkdir(folder) unless File.directory?(folder)
     #FileUtils.mv("#{download_path}/#{file}", "#{folder}/#{file}")
     if file.end_with? 'rar'
@@ -48,6 +65,9 @@ class Downloader
     folder
   end
   
+  def track_count_mismatch?(source, folder)
+    Dir.glob("#{folder}/*.{mp3,flac}").count != source.album.tracks
+  end
   
   def download_path
     "#{Rails.root}/tmp/downloads"

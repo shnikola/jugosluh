@@ -9,7 +9,7 @@ class User < ActiveRecord::Base
   end
   
   def rated_album?(album)
-    user_rating_ids.include?(album.id)
+    user_ratings.where(album_id: album.id).exists?
   end
   
 end

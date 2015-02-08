@@ -1,0 +1,40 @@
+.user-rating {
+  position: relative;
+  text-align: left;
+  width: 250px;
+  padding: 10px;
+  margin: 20px auto;
+  background-color: #eee;
+  
+  .user { font-size: 15px; text-transform: uppercase;}
+  .rating { 
+    text-align: center; line-height: 40px;
+    position: absolute; top: -10px; right: -10px;
+    width: 40px; height: 40px; border-radius: 50%;
+    &.r-1, &.r-2, &.r-3 { background-color: #cd2200;}
+    &.r-4, &.r-5, &.r-6, &.r-7 { background-color: #e1c820;}
+    &.r-8, &.r-9, &.r-10 { background-color: #40df00;}
+  }
+
+  .comment {
+    margin-top: 10px;
+    font-size: 13px;
+  }
+}
+
+.user-rating-form {
+  
+  textarea { 
+    width: 250px;
+    height: 100px;
+    margin-bottom: 10px;
+    padding: 5px;
+    
+    font-size: 13px;
+    font-family: 'Open Sans', serif;
+  }
+  
+  .form-actions {
+    
+  }
+}

@@ -1,11 +1,11 @@
-= form_for(@rating, html: {class: 'pure-form pure-form-aligned login-form'}) do |f|
+%h4 Tvoj komentar 
+= form_for(UserRating.new, html: {class: 'user-rating-form'}) do |f|
+  = f.hidden_field :album_id, value: @album.id
+  = f.text_area :comment
 
-  .pure-control-group
-    = f.label :comment
-    = f.text_area :comment
-
-  .pure-control-group
-    = f.label :rating
-    = f.select :rating, (1..10)
-
-  = f.submit "Submit", class: "pure-button pure-button-primary"
+  .form-actions
+    = f.label :rating do
+      Ocjena
+      = f.select :rating, (1..10)
+    
+    = f.submit "Ocijeni", class: "pure-button pure-button-primary"

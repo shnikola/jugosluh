@@ -1,20 +1,22 @@
-%section.filter
-  = form_tag albums_path, class: 'pure-form', method: 'get' do
-    %fieldset
-      = text_field_tag :search, params[:search], placeholder: "Ime autora ili albuma"
-      = button_tag "Search", class: 'pure-button pure-button-primary'
+.albums-page
+
+  %section.filter
+    = form_tag albums_path, class: 'pure-form', method: 'get' do
+      %fieldset
+        = text_field_tag :search, params[:search], placeholder: "Ime autora ili albuma"
+        = button_tag "Search", class: 'pure-button pure-button-primary'
     
-    %fieldset
-      = select_tag :decade, options_for_select([["Bilo koja godina", nil], "50", "60", "70", "80", "90"], params[:decade])
+      %fieldset
+        = select_tag :decade, options_for_select([["Bilo koja godina", nil], "50", "60", "70", "80", "90"], params[:decade])
       
-%section.albums
+  %section.albums
   
-  = paginate @albums
+    = paginate @albums
 
-  %table.pure-table.pure-table-striped
-    %thead
-      = render 'table_header'
-    %tbody
-      = render @albums
+    %table.pure-table.pure-table-striped
+      %thead
+        = render 'table_header'
+      %tbody
+        = render @albums
 
-  = paginate @albums
+    = paginate @albums

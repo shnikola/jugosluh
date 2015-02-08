@@ -9,7 +9,6 @@ class AlbumsController < ApplicationController
   
   def show
     @album = Album.find(params[:id])
-    @rating = current_user.user_ratings.find_or_initialize_by(album_id: @album.id)
   end
   
   def random
