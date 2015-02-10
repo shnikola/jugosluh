@@ -1,17 +1,18 @@
 class Uploader
   
   def start
-    Source.downloaded.find_each do |source|
+    Source.downloaded.order("download_url").each do |source|
       album = source.album
       next if album.uploaded?
-      
+
+      p "Uploading #{album.id} [#{album.folder_name}]"      
       download_url = upload_folder(album)
       
       if download_url.present?
         album.update_attributes(download_url: download_url)
-        p "OK: #{album.folder_name}"
+        p "Success"
       else
-        p "Fail: #{album.folder_name}"
+        p "Failed :("
       end
     end  
   end

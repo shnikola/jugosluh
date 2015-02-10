@@ -9,11 +9,14 @@
   
   %section.album-buttons
     = link_to "Info", @album.info_url, class: 'pure-button' if @album.info_url
-    = link_to "Play", @album.download_url, class: 'pure-button pure-button-primary' if @album.download_url
+    = link_to "Play", @album.download_url, target: '_blank', class: 'pure-button pure-button-primary' if @album.download_url
     
   %section.album-comments
     %h3 Recenzije
-
+    
+    - if @album.user_ratings.empty?
+      .no-comments Nitko još nije recenzirao album.
+      
     - @album.user_ratings.includes(:user).order("created_at").each do |user_rating|
       = render user_rating
   

@@ -43,7 +43,7 @@ class Collector
   end
   
   def find_album_by_title(title)
-    release = YuAlbums.find_by_name(title)
+    release = DiscogsYu.find_by_name(title)
     Album.find_by_discogs_release_id(release.id).original if release
   end
   

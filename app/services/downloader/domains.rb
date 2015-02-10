@@ -43,7 +43,7 @@ class Downloader
         return nil
       end
       
-      browser.div(class: 'download-complete-icon').wait_until_present(300)
+      browser.div(class: 'download-complete-icon').wait_until_present(600)
       
       30.times do
         sleep 1

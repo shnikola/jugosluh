@@ -16,18 +16,20 @@ class Downloader
         source.multiple_found!
       end
       
+      p "Downloading #{source.id} [#{source.album}]"
       file_name = get_file(source.download_url)
       
       if file_name
         folder = extract_file(source, file_name)
         source.downloaded! unless source.multiple_found?
-        p "OK: [#{source.album_id}] #{source.album} : #{file_name}"
+        p "Success [#{file_name}]"
       else
         source.download_failed!
+        p "Failed :("
       end
       
       if source.downloaded? && track_count_mismatch?(source, folder)
-        source.download_mismatch!
+        source.download_mismatched!
       end
       
       source.save
@@ -42,19 +44,21 @@ class Downloader
   
   def extract_file(source, file)
     folder = "#{download_path}/#{source.album_id}"
-    folder += "_m_#{source.id}" 
+    folder += "_m_#{source.id}" if source.multiple_found?
     Dir.mkdir(folder) unless File.directory?(folder)
-    #FileUtils.mv("#{download_path}/#{file}", "#{folder}/#{file}")
+    FileUtils.mv("#{download_path}/#{file}", "#{folder}/#{file}")
+    
+    escaped_file = file.shellescape
     if file.end_with? 'rar'
-      `unrar x '#{folder}/#{file}' '#{folder}' && rm '#{folder}/#{file}'`
+      `unrar x #{folder}/#{escaped_file} #{folder} && rm #{folder}/#{escaped_file}`
     elsif file.end_with? 'zip'
-      `unzip '#{folder}/#{file}' -d '#{folder}' && rm '#{folder}/#{file}'`
+      `unzip #{folder}/#{escaped_file} -d #{folder} && rm #{folder}/#{escaped_file}`
     end
     
     # If we extracted a folder, move the files out of it
     extracted = Dir.glob("#{folder}/*")
     if extracted.size == 1 && File.directory?(extracted.first)
-      `mv '#{extracted.first}'/* "#{folder}/" && rm -r '#{extracted.first}'`
+      `mv #{extracted.first.shellescape}/* #{folder}/ && rm -r #{extracted.first.shellescape}`
     end
     
     # Clean up crud

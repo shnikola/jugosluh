@@ -7,8 +7,13 @@
         = button_tag "Search", class: 'pure-button pure-button-primary'
     
       %fieldset
-        = select_tag :decade, options_for_select([["Bilo koja godina", nil], "50", "60", "70", "80", "90"], params[:decade])
+        = label_tag :decade, "Desetljeće"
+        = select_tag :decade, options_for_select([["Sva", nil], "50", "60", "70", "80", "90"], params[:decade])
       
+        = label_tag :downloaded do
+          = check_box_tag :downloaded, "1", params[:downloaded]
+          Prikaži samo skinute
+
   %section.albums
   
     = paginate @albums

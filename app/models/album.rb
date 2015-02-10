@@ -3,6 +3,7 @@ class Album < ActiveRecord::Base
   
   scope :original, -> { where(duplicate_of_id: nil) }
   scope :of_interest, -> { original.where(in_yu: true) }
+  scope :non_discogs, -> { where(discogs_release_id: nil) }
   scope :downloaded, -> { where("download_url IS NOT NULL") }
   
   def self.random
@@ -23,35 +24,6 @@ class Album < ActiveRecord::Base
     where(year: year_range)
   end
   
-  def self.update_or_create_from_discogs(release)
-    label = choose_label(release)
-    catnum = label.catno.strip.gsub(/[\s-]+/, "-").upcase
-    if album = find_by(label: label.name, catnum: catnum)
-      album.update_attributes(discogs_release_id: release.id, discogs_master_id: release.master_id, info_url: release.uri)
-      album
-    else
-      artist = release.artists.map{|a| [a.anv.presence || a.name, a.join || ""].join(" ")}.join(" ")
-      artist = artist.gsub(/\s+/, ' ').gsub(" ,", ",").strip
-      original_id = find_origin(release.master_id).try(:id)
-      create(label: label.name, catnum: catnum, year: release.year, artist: artist, title: release.title, 
-               duplicate_of_id: original_id, discogs_release_id: release.id, discogs_master_id: release.master_id,
-               info_url: release.uri, tracks: release.tracklist.size)
-    end
-  end
-  
-  def self.find_origin(master_id)
-    return if master_id.nil?
-    where(duplicate_of_id: nil, discogs_master_id: master_id).first
-  end
-  
-  def self.choose_label(release)
-    label = release.labels.find{|l| ["Jugoton", "PGP RTB", "PGP RTS", "Jugodisk", "Diskos", "Diskoton", "Helidon", "Suzy"].include?(l.name)}
-    if label.nil? && release.labels.length > 1
-      puts "Multiple labels: #{release.id} - #{release.labels.map(&:name)} - #{release.labels.map(&:catno)}\n"
-    end
-    label || release.labels.first
-  end
-  
   def self.find_original_by_catnum(catnum)
     find_by_catnum(catnum.strip.gsub(/[\s-]+/, "-").upcase).try(:original)
   end
@@ -63,7 +35,7 @@ class Album < ActiveRecord::Base
   def folder_name
     "[#{label} #{catnum}] #{artist} - #{title}"
   end
-  
+
   def original
     duplicate_of_id ? Album.find(duplicate_of_id) : self
   end
