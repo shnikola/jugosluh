@@ -2,7 +2,7 @@ class UserRatingsController < ApplicationController
   
   def create
     @rating = current_user.user_ratings.create(user_rating_params)
-    render nothing: true
+    redirect_to album_url(@rating.album_id)
   end
   
   def update

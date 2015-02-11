@@ -13,13 +13,16 @@ class DatabaseSync
   end
   
   def push_all
+    p "Cleaning production database..."
     ProductionAlbum.delete_all
     
+    p "Collecting info..."
     production_albums = []
     Album.find_each do |album|
       production_albums << ProductionAlbum.new(album.attributes)
     end
     
+    p "Pushing to production..." 
     production_albums.each_slice(1000) do |albums|
       ProductionAlbum.import(albums)
     end
