@@ -17,7 +17,8 @@
     position: absolute; top: -10px; right: -10px;
     width: 40px; height: 40px; border-radius: 50%;
     &.r-1, &.r-2, &.r-3 { background-color: #cd2200;}
-    &.r-4, &.r-5, &.r-6, &.r-7 { background-color: #e1c820;}
+    &.r-4, &.r-5 { background-color: #e1c820;}
+    &.r-6, &.r-7 { background-color: #8fa722;}
     &.r-8, &.r-9, &.r-10 { background-color: #40df00;}
   }
 

@@ -13,7 +13,8 @@ class Album < ActiveRecord::Base
   
   def self.search(query)
     if query.present?
-      where(["artist", "title", "catnum"].map {|c| "#{c} LIKE :query"}.join(" OR "), query: "%#{query.strip}%")
+      like_func = Rails.env.production? ? "ILIKE" : "LIKE"
+      where(["artist", "title", "catnum"].map {|c| "#{c} #{like_func} :query"}.join(" OR "), query: "%#{query.strip}%")
     else
       all
     end

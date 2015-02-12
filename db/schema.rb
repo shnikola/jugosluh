@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150207134702) do
+ActiveRecord::Schema.define(version: 20150212093123) do
 
   create_table "albums", force: true do |t|
     t.string  "label"
@@ -25,8 +25,9 @@ ActiveRecord::Schema.define(version: 20150207134702) do
     t.string  "info_url",           limit: 700
     t.string  "download_url"
     t.boolean "in_yu"
-    t.boolean "confirmed",                      default: false
+    t.boolean "incorrect",                      default: false
     t.integer "tracks"
+    t.integer "drive_id"
   end
 
   add_index "albums", ["catnum"], name: "index_albums_on_catnum", using: :btree
