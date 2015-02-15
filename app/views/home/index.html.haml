@@ -5,7 +5,7 @@
     .legend
       Poslušano #{ number_with_delimiter @stats[:listened] } / 
       Sakupljeno #{ number_with_delimiter @stats[:downloaded] } / 
-      Pronadjeno #{ number_with_delimiter @stats[:found] }
+      Pronađeno #{ number_with_delimiter @stats[:found] }
     
   %section.start-actions
     %h3 Kreni slušati
@@ -15,11 +15,10 @@
   
     - [50, 60, 70, 80].each do |d|
       = link_to "#{d}-te", albums_path(decade: d), class: 'tag-link'
-    = link_to "pretraži", albums_path, class: 'tag-link'
+    = link_to "pretraži sve", albums_path, class: 'tag-link highlighted'
 
   %section.latest-comments
     %h3 Najsvježiji komentari
 
     - @user_ratings.each do |user_rating|
-      = render user_rating
-      .user-rating-location za #{link_to user_rating.album, user_rating.album}
+      = render partial: 'home/user_rating', object: user_rating

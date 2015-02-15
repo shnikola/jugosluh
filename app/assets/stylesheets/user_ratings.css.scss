@@ -13,13 +13,8 @@
   }
   
   .rating { 
-    text-align: center; line-height: 40px;
+    line-height: 40px; width: 40px; height: 40px; 
     position: absolute; top: -10px; right: -10px;
-    width: 40px; height: 40px; border-radius: 50%;
-    &.r-1, &.r-2, &.r-3 { background-color: #cd2200;}
-    &.r-4, &.r-5 { background-color: #e1c820;}
-    &.r-6, &.r-7 { background-color: #8fa722;}
-    &.r-8, &.r-9, &.r-10 { background-color: #40df00;}
   }
 
   .comment {
@@ -28,12 +23,23 @@
   }
 }
 
+.rating {
+  text-align: center;
+  border-radius: 50%;
+  &.r-1, &.r-2, &.r-3 { background-color: #cd2200;}
+  &.r-4, &.r-5 { background-color: #e1c820;}
+  &.r-6, &.r-7 { background-color: #8fa722;}
+  &.r-8, &.r-9, &.r-10 { background-color: #40df00;}
+}
+
 .user-rating-form {
+  width: 300px;
+  margin: auto;
   
-  textarea { 
-    width: 250px;
+  textarea {
+    width: 290px;
     height: 100px;
-    margin-bottom: 10px;
+    margin: 0 auto 10px;
     padding: 5px;
     
     font-size: 13px;
@@ -41,6 +47,7 @@
   }
   
   .form-actions {
-    
+    .rating {float: left; line-height: 38px;}
+    .pure-button {float: right;}
   }
 }

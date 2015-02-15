@@ -1,7 +1,8 @@
 %tr
-  %td.artist= album.artist
-  %td.title= link_to album.title, album
+  %td.title= link_to album, album
   %td.year= album.year
-  %td.catnum= album.catnum
-  %td.label= album.label
-  
+  %td.label #{album.label} #{album.catnum}
+  %td.info= link_to "Discogs", album.info_url, target: '_blank' if album.info_url
+  %td.ratings
+    - album.user_ratings.each do |user_rating|
+      .rating{class: "r-#{user_rating.rating}"}= user_rating.rating

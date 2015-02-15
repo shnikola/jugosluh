@@ -9,5 +9,5 @@ Rails.application.routes.draw do
   end
 
   resources :users, only: [:show]
-  resources :user_ratings, only: [:create, :update, :destroy]
+  resources :user_ratings, only: [:create, :edit, :update, :destroy]
 end

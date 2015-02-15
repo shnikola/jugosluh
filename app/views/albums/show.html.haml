@@ -8,8 +8,8 @@
       #{@album.label}, #{@album.catnum}, #{@album.year}.
   
   %section.album-buttons
-    = link_to "Info", @album.info_url, class: 'pure-button' if @album.info_url
-    = link_to "Play", @album.download_url, target: '_blank', class: 'pure-button pure-button-primary' if @album.download_url
+    = link_to "Info", @album.info_url, target: '_blank', class: 'pure-button' if @album.info_url
+    = link_to "Play", @album.download_url, data: {popup: true}, class: 'pure-button pure-button-primary' if @album.download_url
     
   %section.album-comments
     %h3 Recenzije
@@ -18,7 +18,7 @@
       .no-comments Nitko još nije recenzirao album.
       
     - @album.user_ratings.includes(:user).order("created_at").each do |user_rating|
-      = render user_rating
+      = render partial: 'albums/user_rating', object: user_rating
   
     - if !current_user.rated_album?(@album)
       = render 'rating_form'

@@ -1,5 +1,7 @@
 class Uploader
   
+  CURRENT_DRIVE_ID = 1
+  
   def start
     Source.downloaded.order("download_url").each do |source|
       album = source.album
@@ -9,7 +11,7 @@ class Uploader
       download_url = upload_folder(album)
       
       if download_url.present?
-        album.update_attributes(download_url: download_url)
+        album.update_attributes(download_url: download_url, drive_id: CURRENT_DRIVE_ID)
         p "Success"
       else
         p "Failed :("
@@ -20,10 +22,11 @@ class Uploader
   def upload_folder(album)
     FileUtils.copy_entry("#{download_path}/#{album.id}", "#{upload_path}/#{album.id}")
     success = system("#{drive_program} push -no-prompt=true '#{upload_path}/#{album.id}'")
-    if success
-      result = `#{drive_program} pub '#{upload_path}/#{album.id}'`
-      result.match(/Published on (.*)$/).try(:[], 1)
-    end
+    return nil if !success
+    
+    result = `#{drive_program} pub '#{upload_path}/#{album.id}'`
+    folder_id = result.match(/Published on https:\/\/googledrive.com\/host\/(.*)$/).try(:[], 1)
+    "https://drive.google.com/folderview?id=#{folder_id}"
   end
   
   def download_path
@@ -37,4 +40,5 @@ class Uploader
   def drive_program
     "~/go/bin/drive"
   end
+  
 end

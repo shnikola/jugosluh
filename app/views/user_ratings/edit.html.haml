@@ -1,0 +1,10 @@
+%h3 Ispravak recenzije
+= form_for(@rating, html: {class: 'user-rating-form'}) do |f|
+  = f.text_area :comment
+
+  .form-actions
+    = f.label :rating do
+      Ocjena
+      = f.select :rating, (1..10)
+    
+    = f.submit "Ocijeni", class: "pure-button pure-button-primary"

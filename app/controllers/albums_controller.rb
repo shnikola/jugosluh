@@ -1,11 +1,13 @@
 class AlbumsController < ApplicationController
   
   def index
-    @albums = Album.of_interest
-    @albums = @albums.downloaded if params[:downloaded].present?
+    @albums = params[:show_all].present? ? Album.of_interest : Album.downloaded
+    @albums = @albums.includes(:user_ratings)
     @albums = @albums.search(params[:search]) if params[:search].present?
     @albums = @albums.from_decade(params[:decade]) if params[:decade].present?
-    @albums = @albums.order("label, catnum")
+    
+    @albums = params[:decade].present? ? @albums.order("year, label, catnum") : @albums.order("label, catnum")
+    
     @albums = @albums.page(params[:page]).per(100)
   end
   

@@ -1,0 +1,6 @@
+.user-rating
+  .rating{class: "r-#{user_rating.rating}"}= user_rating.rating
+  .user= user_rating.user
+  .comment= user_rating.comment
+  .edit
+    = link_to "Promijeni", edit_user_rating_path(user_rating) if user_rating.user_id == current_user.id

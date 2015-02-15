@@ -4,8 +4,8 @@
   = f.text_area :comment
 
   .form-actions
-    = f.label :rating do
-      Ocjena
+    = f.label :rating, class: 'rating' do
+      Ocjena:
       = f.select :rating, (1..10)
     
     = f.submit "Ocijeni", class: "pure-button pure-button-primary"

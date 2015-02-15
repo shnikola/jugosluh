@@ -5,10 +5,14 @@ class UserRatingsController < ApplicationController
     redirect_to album_url(@rating.album_id)
   end
   
+  def edit
+    @rating = current_user.user_ratings.find(params[:id])
+  end
+  
   def update
     @rating = current_user.user_ratings.find(params[:id])
     @rating.update_attributes(user_rating_params)
-    render nothing: true
+    redirect_to album_url(@rating.album_id)
   end
   
   private

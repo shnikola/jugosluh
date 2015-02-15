@@ -3,16 +3,18 @@
   %section.filter
     = form_tag albums_path, class: 'pure-form', method: 'get' do
       %fieldset
+        = label_tag :decade do
+          Desetljeće:
+          = select_tag :decade, options_for_select([["Sva", nil], "50", "60", "70", "80", "90"], params[:decade])
+      
+        = label_tag :show_all do
+          = check_box_tag :show_all, "1", params[:show_all]
+          Prikaži i nesakupljene
+      
+      %fieldset
         = text_field_tag :search, params[:search], placeholder: "Ime autora ili albuma"
         = button_tag "Search", class: 'pure-button pure-button-primary'
     
-      %fieldset
-        = label_tag :decade, "Desetljeće"
-        = select_tag :decade, options_for_select([["Sva", nil], "50", "60", "70", "80", "90"], params[:decade])
-      
-        = label_tag :downloaded do
-          = check_box_tag :downloaded, "1", params[:downloaded]
-          Prikaži samo skinute
 
   %section.albums
   
