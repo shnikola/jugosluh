@@ -6,7 +6,7 @@ class AlbumsController < ApplicationController
     @albums = @albums.search(params[:search]) if params[:search].present?
     @albums = @albums.from_decade(params[:decade]) if params[:decade].present?
     
-    @albums = @albums.order("#{params[:sort]} #{params[:direction]} #{'NULLS LAST' if Rails.env.production?}")
+    @albums = @albums.order("#{params[:sort]} #{params[:direction]} #{'NULLS LAST' if Rails.env.production?}") if params[:sort].present?
     
     @albums = @albums.page(params[:page]).per(100)
   end
