@@ -1,0 +1,10 @@
+.album-issues-page
+  %h3 Prijavi problem 
+  %h4= @album
+  
+  = form_for(AlbumIssue.new, html: {class: 'album-issue-form'}) do |f|
+    = f.hidden_field :album_id, value: @album.id
+    = f.text_area :message
+
+    .form-actions    
+      = f.submit "Prijavi", class: "pure-button pure-button-primary"

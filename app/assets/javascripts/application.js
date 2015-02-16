@@ -3,8 +3,11 @@
 
 $(function() {
   $('a[data-popup]').on('click', function(e) {
-    console.log($(this).attr('href')) 
     window.open($(this).attr('href'), "Play", 'height=550,width=850'); 
     e.preventDefault();
+  });
+  
+  $("input.autosubmit, select.autosubmit").on("change", function() {
+    $(this).parents("form").submit();
   });
 });

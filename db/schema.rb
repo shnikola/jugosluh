@@ -11,7 +11,15 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150212093123) do
+ActiveRecord::Schema.define(version: 20150215181044) do
+
+  create_table "album_issues", force: true do |t|
+    t.integer  "album_id"
+    t.integer  "user_id"
+    t.text     "message"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "albums", force: true do |t|
     t.string  "label"
@@ -28,6 +36,7 @@ ActiveRecord::Schema.define(version: 20150212093123) do
     t.boolean "incorrect",                      default: false
     t.integer "tracks"
     t.integer "drive_id"
+    t.float   "average_rating",     limit: 24
   end
 
   add_index "albums", ["catnum"], name: "index_albums_on_catnum", using: :btree

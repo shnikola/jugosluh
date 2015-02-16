@@ -10,11 +10,16 @@
     table {
       width: 80%;
       margin: auto;
+      text-align: left;  
     }
-  
+    
     .label, .ratings {
       word-break: keep-all;
       white-space: nowrap;
+    }
+    
+    .ratings {
+      text-align: center;
     }
     
     .ratings .rating {
@@ -33,6 +38,11 @@
 .album-page {
   
   h4 { margin: 25px 0 5px 0;}
+  
+  .report {
+    font-size: 13px;
+    margin: 10px 0;
+  }
   
   .user-rating {
     .edit {

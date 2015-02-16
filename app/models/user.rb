@@ -1,5 +1,6 @@
 class User < ActiveRecord::Base
   has_many :user_ratings
+  has_many :album_issues
   
   devise :database_authenticatable, :rememberable, :trackable, :validatable
   #devise :registerable

@@ -1,14 +1,22 @@
 class DatabaseSync
   
   def start
-    pull_confirmed
+    pull_ratings
     push_all
   end
   
-  def pull_confirmed
-    confirmed_ids = ProductionAlbum.where(confirmed: true).pluck(:id)
-    confirmed_ids.each_slice(100) do |ids|
-      Album.where(id: ids).update_all(confirmed: true)
+  def pull_ratings
+    p "Cleaning production database..."
+    UserRating.delete_all
+    
+    p "Pulling user ratings..."
+    user_ratings = []
+    ProductionUserRating.find_each do |user_rating|
+      user_ratings << UserRating.new(user_rating.attributes)
+    end
+    
+    user_ratings.each_slice(1000) do |ratings|
+      UserRating.import(ratings)
     end
   end
   
@@ -31,7 +39,21 @@ class DatabaseSync
 end
 
 
+
 class ProductionAlbum < Album
+  establish_connection(
+    adapter: "postgresql",
+    host: '163.47.63.206',
+    port: 5432,
+    encoding: 'utf8',
+    username: "app",
+    password: ENV['PRODUCTION_DATABASE_PASSWORD'],
+    database: "db13099"
+  )
+  
+end
+
+class ProductionUserRating < UserRating
   establish_connection(
     adapter: "postgresql",
     host: '163.47.63.206',

@@ -1,6 +1,7 @@
 %tr
-  %th Izdanje
-  %th Godina
-  %th Label
+  %th= sortable("artist", "Izvođač")
+  %th= sortable("title", "Naslov")
+  %th= sortable("year", "Godina")
+  %th= sortable("label, catnum", "Label") 
   %th Info
-  %th Ocjene
+  %th= sortable("average_rating", "Ocjene")

@@ -1,5 +1,6 @@
 %tr
-  %td.title= link_to album, album
+  %td.artist= album.artist
+  %td.title= link_to album.title, album
   %td.year= album.year
   %td.label #{album.label} #{album.catnum}
   %td.info= link_to "Discogs", album.info_url, target: '_blank' if album.info_url
