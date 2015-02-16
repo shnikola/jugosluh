@@ -1,7 +1,7 @@
 class AlbumIssuesController < ApplicationController
   
   def index
-    @issues = AlbumIssues.all
+    @issues = AlbumIssues.includes(:user, :album)
   end
   
   def new

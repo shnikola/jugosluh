@@ -1,29 +1,7 @@
-.albums-page
-
-  %section.filter
-    = form_tag albums_path, class: 'pure-form', method: 'get' do
-      %fieldset
-        = label_tag :decade do
-          Desetljeće:
-          = select_tag :decade, options_for_select(decade_options, params[:decade]), class: 'autosubmit'
-      
-        = label_tag :show_all do
-          = check_box_tag :show_all, "1", params[:show_all], class: 'autosubmit'
-          Prikaži i nesakupljene
-      
-      %fieldset
-        = text_field_tag :search, params[:search], placeholder: "Ime autora ili albuma"
-        = submit_tag "Traži", class: 'pure-button pure-button-primary'
-    
+.album-issues-page
 
   %section.albums
   
-    = paginate @albums
-
     %table.pure-table.pure-table-striped
-      %thead
-        = render 'table_header'
       %tbody
-        = render @albums
-
-    = paginate @albums
+        = render @issues

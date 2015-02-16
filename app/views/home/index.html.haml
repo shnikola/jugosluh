@@ -1,11 +1,7 @@
 .home-page
 
   %section.stats
-    .todo-progress-bar
-    .legend
-      Poslušano #{ number_with_delimiter @stats[:listened] } / 
-      Sakupljeno #{ number_with_delimiter @stats[:downloaded] } / 
-      Pronađeno #{ number_with_delimiter @stats[:found] }
+    = homepage_progress_bar(@stats)
     
   %section.start-actions
     %h3 Slušaj:

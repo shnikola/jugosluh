@@ -1,0 +1,10 @@
+.user-page
+  %h2 #{@user}
+  
+  %h3 Recenzije
+  
+  %table.pure-table.pure-table-striped
+    %thead
+      = render 'table_header'
+    %tbody
+      = render partial: 'users/user_rating', collection: @user_ratings
