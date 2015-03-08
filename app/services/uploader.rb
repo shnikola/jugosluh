@@ -1,11 +1,13 @@
 class Uploader
   
-  CURRENT_DRIVE_ID = 1
+  CURRENT_DRIVE_ID = 2
   
-  def start
-    Source.downloaded.order("download_url").each do |source|
+  def start(*ids)
+    sources = Source.downloaded
+    sources.where!(album_id: ids) if ids.present?
+    sources.order("download_url").each do |source|
       album = source.album
-      next if album.uploaded?
+      next if album.uploaded? || !album.in_yu?
 
       p "Uploading #{album.id} [#{album.folder_name}]"      
       download_url = upload_folder(album)

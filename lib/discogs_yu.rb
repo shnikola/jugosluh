@@ -20,9 +20,10 @@ module DiscogsYu
   end
   
   def self.find_by_id(id)
+    return nil unless id
     discogs.get_release(id)
   rescue Discogs::UnknownResource => e
-    p "Couldn't find: #{release}"
+    p "Couldn't find: #{id}"
     return nil
   rescue EOFError, OpenSSL::SSL::SSLError, Errno::ECONNRESET => e
     p "#{e}, retrying..."

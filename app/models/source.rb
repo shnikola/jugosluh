@@ -1,7 +1,8 @@
 class Source < ActiveRecord::Base
   belongs_to :album
   
-  enum status: { 
+  enum status: {
+    skipped: -1,            # Not related to our research
     waiting: 0,             # Initial state when scraped
     confirmed: 1,           # Confirmed to be ex-YU 
     multiple_found: 2,      # Multiple sources point to same album

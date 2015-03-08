@@ -6,10 +6,9 @@ class DatabaseSync
   end
   
   def pull_ratings
-    p "Cleaning production database..."
+    p "Pulling user ratings..."
     UserRating.delete_all
     
-    p "Pulling user ratings..."
     user_ratings = []
     ProductionUserRating.find_each do |user_rating|
       user_ratings << UserRating.new(user_rating.attributes)

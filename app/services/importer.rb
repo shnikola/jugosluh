@@ -71,7 +71,9 @@ class Importer
   def select_best_original(album)
     # If the duplicate was out earlier than the original, choose it as an original
     original = album.original
-    if (album.year != 0 && album.year < original.year) || album.discogs_release_id < original.discogs_release_id
+    earlier_year = album.year != 0 && album.year < original.year
+    earlier_release = album.discogs_release_id.to_s < original.discogs_release_id.to_s
+    if earlier_year || earlier_release
       original.id = 0
       original.save
     
