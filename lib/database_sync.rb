@@ -17,6 +17,11 @@ class DatabaseSync
     user_ratings.each_slice(1000) do |ratings|
       UserRating.import(ratings)
     end
+    
+    p "Recalculating ratings"
+    Album.includes(:user_ratings).where(id: user_ratings.map(&:album_id).find_each do |a|
+      album.calculate_average_rating
+    end
   end
   
   def push_all

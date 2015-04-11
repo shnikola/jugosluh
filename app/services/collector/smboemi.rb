@@ -3,7 +3,7 @@ require "open-uri"
 class Collector
   module Smboemi
   
-    def smboemi_crawl(&block)
+    def smboemi_crawl
       page_ids = [
         35..57,
         62..84,
@@ -26,7 +26,7 @@ class Collector
       page_ids.each do |id|
         noko = Nokogiri::HTML(open("http://www.smboemi.com/archive/index.php/f-#{id}.html"))
         noko.css("#content a").each do |thread_link|
-          smboemi_crawl_thread(thread_link["href"], &block)
+          smboemi_crawl_thread(thread_link["href"])
         end
       end
     end
@@ -41,18 +41,19 @@ class Collector
         next unless text.include? "]!"
         mega_id = text.match(/](!.+)/)[1].strip
         download_url = "http://mega.co.nz/##{mega_id}"
-        next if Source.where(download_url: download_url).exist?
+        next if Source.where(download_url: download_url).exists?
         
         clean_lines = text.lines.reject{|l| l.strip.start_with?("[Samo") || l.blank?}
         title = clean_lines[0].try(:first, 255).try(:strip)
         source = Source.create(
           title: title,
           artist: artist,
-          catnum: catnum_guess(details),
+          catnum: Catnum.guess(clean_lines.first),
           details: clean_lines.join("\n"),
           download_url: download_url
         )
-        yield source
+        
+        finalize_source(source)
       end
     end
     

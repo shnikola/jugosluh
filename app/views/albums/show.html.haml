@@ -2,15 +2,16 @@
 
   %section.album-info
     %h3= link_to @album.artist, albums_path(search: @album.artist)
-    %h2= @album.title 
-  
+    = image_tag @album.image_url, class: 'album-image' if @album.image_url.present?
+    %h2= @album.title
+      
     .details
       #{@album.label}, #{@album.catnum}, #{@album.year}.
-  
-  %section.album-buttons
-    = link_to "Info", @album.info_url, target: '_blank', class: 'pure-button' if @album.info_url
-    = link_to "Play", @album.download_url, data: {popup: true}, class: 'pure-button pure-button-primary' if @album.download_url
-    .report=link_to "Prijavi pogrešku", new_album_issue_path(album_id: @album.id)
+    
+    .album-buttons
+      = link_to "Info", @album.info_url, target: '_blank', class: 'pure-button' if @album.info_url
+      = link_to "Play", @album.download_url, data: {popup: true}, class: 'pure-button pure-button-primary' if @album.download_url
+      .report=link_to "Prijavi pogrešku", new_album_issue_path(album_id: @album.id)
     
   %section.album-comments
     %h3 Recenzije

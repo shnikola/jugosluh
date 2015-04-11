@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150215181044) do
+ActiveRecord::Schema.define(version: 20150410170827) do
 
   create_table "album_issues", force: true do |t|
     t.integer  "album_id"
@@ -37,6 +37,7 @@ ActiveRecord::Schema.define(version: 20150215181044) do
     t.integer "tracks"
     t.integer "drive_id"
     t.float   "average_rating",     limit: 24
+    t.string  "image_url"
   end
 
   add_index "albums", ["catnum"], name: "index_albums_on_catnum", using: :btree

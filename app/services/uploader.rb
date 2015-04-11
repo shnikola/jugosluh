@@ -18,7 +18,7 @@ class Uploader
       else
         p "Failed :("
       end
-    end  
+    end
   end
   
   def upload_folder(album)

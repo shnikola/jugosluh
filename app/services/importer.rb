@@ -16,7 +16,7 @@ class Importer
   
   def save_to_db(release)
     label_info = select_label_info(release.labels)
-    catnum = label_info.catno.strip.gsub(/[\s-]+/, "-").to_lat.upcase
+    catnum = Catnum.normalize(label_info.catno)
     
     # Check by label+catnum if we have the same non-discogs album already in db
     if album = Album.non_discogs.find_by(label: label_info.name, catnum: catnum)
@@ -38,6 +38,7 @@ class Importer
       discogs_release_id: release.id,
       discogs_master_id: release.master_id,
       info_url: release.uri,
+      image_url: select_image_url(release.images),
       tracks: release.tracklist.size
     )
     
@@ -61,6 +62,12 @@ class Importer
   def select_artist_info(artists)
     artist = artists.map{|a| [a.anv.presence || a.name, a.join || ""].join(" ")}.join(" ")
     artist = artist.gsub(/\s+/, ' ').gsub(" ,", ",").strip.to_lat
+  end
+  
+  def select_image_url(images)
+    return nil if images.blank?
+    image = images.detect{|i| i.type == 'primary'} || images.first
+    image.uri if image
   end
   
   def find_original_id(master_id)

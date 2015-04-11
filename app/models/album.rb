@@ -26,7 +26,13 @@ class Album < ActiveRecord::Base
   end
   
   def self.find_original_by_catnum(catnum)
-    find_by_catnum(catnum.strip.gsub(/[\s-]+/, "-").upcase).try(:original)
+    find_by_catnum(Catnum.normalize(catnum)).try(:original)
+  end
+  
+  def self.find_original_by_title(title)
+    # TODO: search for non-discogs albums too
+    release = DiscogsYu.find_by_name(title)
+    find_by_discogs_release_id(release.id).try(:original) if release
   end
   
   def to_s
