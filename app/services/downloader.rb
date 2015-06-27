@@ -6,8 +6,11 @@ class Downloader
   include Downloader::Domains
   
   def start(from_id = nil)
-    Source.to_download.where("download_url LIKE '%file-upload%'").where("id >= ?", from_id || 0).find_each do |source|
-      next if source.album.uploaded?
+    Source.to_download.where("id >= ?", from_id || 0).find_each do |source|
+      if source.album.uploaded?
+        source.downloaded!
+        next
+      end
       
       p "Downloading #{source.id} [#{source.album}]"
       file_name = get_file(source.download_url)

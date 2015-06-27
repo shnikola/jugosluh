@@ -29,5 +29,5 @@ production:
   encoding: utf8
   database: jugosluh_production
   pool: 5
-  username: root
-  password:
+  username: rails
+  password: <%= ENV['APP_DATABASE_PASSWORD'] %>

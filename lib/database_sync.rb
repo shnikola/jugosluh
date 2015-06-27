@@ -19,7 +19,7 @@ class DatabaseSync
     end
     
     p "Recalculating ratings"
-    Album.includes(:user_ratings).where(id: user_ratings.map(&:album_id).find_each do |a|
+    Album.includes(:user_ratings).where(id: user_ratings.map(&:album_id)).find_each do |album|
       album.calculate_average_rating
     end
   end

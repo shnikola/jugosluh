@@ -39,7 +39,7 @@ class Importer
       discogs_master_id: release.master_id,
       info_url: release.uri,
       image_url: select_image_url(release.images),
-      tracks: release.tracklist.size
+      tracks: select_tracks(release.tracklist)
     )
     
     select_best_original(album) if album.duplicate_of_id?
@@ -68,6 +68,10 @@ class Importer
     return nil if images.blank?
     image = images.detect{|i| i.type == 'primary'} || images.first
     image.uri if image
+  end
+  
+  def select_tracks(tracklist)
+    tracklist.count{|t| t.type_ == "track" }
   end
   
   def find_original_id(master_id)

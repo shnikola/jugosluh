@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
 
-gem 'rails', '~> 4.1'
+gem 'rails', '~> 4.2'
 
 gem 'mysql2', group: :development
 gem 'pg', group: :production

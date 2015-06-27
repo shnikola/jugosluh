@@ -13,9 +13,5 @@ class Source < ActiveRecord::Base
   
   scope :unconnected, -> { where(album_id: nil) }
   scope :to_download, -> { confirmed.where("album_id IS NOT NULL") }
-  
-  def clean_title
-    title.gsub(/19\d\d/, '').gsub(/\-\s?\d\s?\-/, '') if title # years confuse me
-  end
-  
+
 end

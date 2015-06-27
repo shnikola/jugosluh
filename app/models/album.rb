@@ -31,7 +31,11 @@ class Album < ActiveRecord::Base
   
   def self.find_original_by_title(title)
     # TODO: search for non-discogs albums too
-    release = DiscogsYu.find_by_name(title)
+    title = title.downcase
+    title = title.gsub(/19\d\d/, '').gsub(/\-\s?\d\s?\-/, '') # years confuse me
+    title_dj = title.gsub("dj", "đ")
+  
+    release = DiscogsYu.find_by_name(title) || DiscogsYu.find_by_name(title_dj)
     find_by_discogs_release_id(release.id).try(:original) if release
   end
   

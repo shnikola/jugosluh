@@ -1,6 +1,6 @@
 class Uploader
   
-  CURRENT_DRIVE_ID = 2
+  CURRENT_DRIVE_ID = 4
   
   def start(*ids)
     sources = Source.downloaded
