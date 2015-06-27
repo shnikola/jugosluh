@@ -7,14 +7,12 @@ class Album < ActiveRecord::Base
   scope :downloaded, -> { where("download_url IS NOT NULL") }
   
   def self.random
-    random_func = Rails.env.production? ? "RANDOM()" : "RAND()"
-    order(random_func).first
+    order("RAND()").first
   end
   
   def self.search(query)
     if query.present?
-      like_func = Rails.env.production? ? "ILIKE" : "LIKE"
-      where(["artist", "title", "catnum"].map {|c| "#{c} #{like_func} :query"}.join(" OR "), query: "%#{query.strip}%")
+      where(["artist", "title", "catnum"].map {|c| "#{c} LIKE :query"}.join(" OR "), query: "%#{query.strip}%")
     else
       all
     end
