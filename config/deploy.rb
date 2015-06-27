@@ -11,7 +11,7 @@ require 'mina/rvm'    # for rvm support. (http://rvm.io)
 #   branch       - Branch name to deploy. (needed by mina/git)
 
 set :domain, '46.101.252.147'
-set :deploy_to, '/var/www/jugosluh'
+set :deploy_to, '/home/jugosluh'
 set :repository, 'https://github.com/shnikola/jugosluh.git'
 set :branch, 'master'
 

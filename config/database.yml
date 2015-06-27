@@ -25,9 +25,9 @@ test:
   reconnect: true
 
 production:
-  adapter: postgresql
+  adapter: mysql2
   encoding: utf8
   database: jugosluh
-  pool: 5
+  host: localhost
   username: rails
   password: <%= ENV['APP_DATABASE_PASSWORD'] %>

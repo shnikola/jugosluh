@@ -42,8 +42,7 @@ gem 'devise'
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 
-gem 'thin', group: :development
-gem 'unicorn', group: :production
+gem 'unicorn'
 
 # Use debugger
 # gem 'debugger', group: [:development, :test]
