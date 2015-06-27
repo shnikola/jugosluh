@@ -27,7 +27,7 @@ test:
 production:
   adapter: postgresql
   encoding: utf8
-  database: jugosluh_production
+  database: jugosluh
   pool: 5
   username: rails
   password: <%= ENV['APP_DATABASE_PASSWORD'] %>

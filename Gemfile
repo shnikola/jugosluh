@@ -42,10 +42,8 @@ gem 'devise'
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 
-gem 'thin'  
-
-# Use Capistrano for deployment
-# gem 'capistrano-rails', group: :development
+gem 'thin', group: :development
+gem 'unicorn', group: :production
 
 # Use debugger
 # gem 'debugger', group: [:development, :test]
