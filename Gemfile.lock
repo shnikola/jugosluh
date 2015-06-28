@@ -109,6 +109,7 @@ GEM
     kgio (2.9.3)
     launchy (2.4.3)
       addressable (~> 2.3)
+    libv8 (3.16.14.7)
     little-plugger (1.1.3)
     logging (2.0.0)
       little-plugger (~> 1.1)
@@ -160,6 +161,7 @@ GEM
     raindrops (0.14.0)
     rake (10.4.2)
     rdoc (4.2.0)
+    ref (1.0.5)
     responders (2.1.0)
       railties (>= 4.2.0, < 5)
     retriable (1.4.1)
@@ -193,6 +195,9 @@ GEM
       actionpack (>= 3.0)
       activesupport (>= 3.0)
       sprockets (>= 2.8, < 4.0)
+    therubyracer (0.12.0)
+      libv8 (~> 3.16.14.0)
+      ref
     thor (0.19.1)
     thread_safe (0.3.5)
     tilt (1.4.1)
@@ -230,6 +235,7 @@ DEPENDENCIES
   rails (~> 4.2)
   sass-rails (~> 4.0.3)
   sdoc (~> 0.4.0)
+  therubyracer
   uglifier (>= 1.3.0)
   unicorn
   watir-webdriver
