@@ -1,6 +1,6 @@
 .user-rating
   .rating{class: "r-#{user_rating.rating}"}= user_rating.rating
-  .user= user_rating.user
+  .user= link_to user_rating.user, user_path(user_rating.user)
   .comment= user_rating.comment
 
 .user-rating-location za #{link_to user_rating.album, user_rating.album}

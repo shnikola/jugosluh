@@ -7,7 +7,7 @@ class HomeController < ApplicationController
       listened: current_user.user_ratings.count
     }
     
-    @user_ratings = UserRating.includes(:user, :album).order("created_at DESC").first(5)
+    @user_ratings = UserRating.includes(:user, :album).order("created_at DESC").first(10)
   end
   
 end
