@@ -11,7 +11,7 @@ gem 'haml'
 gem 'quiet_assets', '~> 1.1.0'
 
 # See https://github.com/sstephenson/execjs#readme for more supported runtimes
-# gem 'therubyracer',  platforms: :ruby
+gem 'therubyracer',  platforms: :ruby
 
 gem 'jquery-rails'
 
