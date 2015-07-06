@@ -3,7 +3,7 @@ class HomeController < ApplicationController
   def index
     @stats = { 
       found: Album.of_interest.count,
-      downloaded: Album.of_interest.downloaded.count,
+      uploaded: Album.of_interest.uploaded.count,
       listened: current_user.user_ratings.count
     }
     

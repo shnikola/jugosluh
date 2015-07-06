@@ -76,9 +76,10 @@ class Downloader
       watir_download(30) do
         browser.goto url
         sleep 5
-        browser.execute_script("window.onbeforeunload = null") # Disable prompts
-      
-        browser.div(class: 'new-download-red-button').when_present.click
+        browser.execute_script("window.onbeforeunload = null;") # Disable prompts
+        browser.execute_script("localStorage.setItem('noOverlay', true);") # Disable overlay
+
+        browser.div(class: 'new-download-button-txt2').when_present.click
         sleep 5
       
         if browser.div(class: 'temporary-error').present?

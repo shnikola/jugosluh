@@ -4,13 +4,11 @@ class Importer
   
   def start
     DiscogsYu.find_each do |release|
-      next if Album.where(discogs_release_id: release.id).exists?
-
-      sleep(0.5) # move to discogs yu
-      
-      p "Importing #{release.id} [#{release.title}]"
-      full_release = DiscogsYu.find_by_id(release.id)
-      save_to_db(full_release) if full_release
+      if Album.where(discogs_release_id: release.id).exists?
+        p "Importing #{release.id} [#{release.title}]"
+        full_release = DiscogsYu.find_by_id(release.id)
+        save_to_db(full_release) if full_release
+      end
     end
   end
   
@@ -24,9 +22,7 @@ class Importer
       return album
     end
     
-    # So this is a completely new release to us
     artist = select_artist_info(release.artists)
-    original_id = find_original_id(release.master_id)
     
     album = Album.create(
       label: label_info.name,
@@ -41,9 +37,8 @@ class Importer
       image_url: select_image_url(release.images),
       tracks: select_tracks(release.tracklist)
     )
-    
-    select_best_original(album) if album.duplicate_of_id?
-    
+
+    check_for_duplicate(album)
     album
   end
   
@@ -61,7 +56,7 @@ class Importer
   
   def select_artist_info(artists)
     artist = artists.map{|a| [a.anv.presence || a.name, a.join || ""].join(" ")}.join(" ")
-    artist = artist.gsub(/\s+/, ' ').gsub(" ,", ",").strip.to_lat
+    artist = artist.gsub(/\s+/, ' ').gsub(" ,", ",").gsub(/,\s?$/, '').strip.to_lat
   end
   
   def select_image_url(images)
@@ -74,29 +69,24 @@ class Importer
     tracklist.count{|t| t.type_ == "track" }
   end
   
-  def find_original_id(master_id)
-    return if master_id.nil?
-    Album.original.where(discogs_master_id: master_id).pluck(:id).first
-  end
-  
-  def select_best_original(album)
-    # If the duplicate was out earlier than the original, choose it as an original
-    original = album.original
-    earlier_year = album.year != 0 && album.year < original.year
-    earlier_release = album.discogs_release_id.to_s < original.discogs_release_id.to_s
-    if earlier_year || earlier_release
-      original.id = 0
-      original.save
+  def check_for_duplicate(album)
+    original = find_original(album)
+    return if original.nil?
     
-      duplicate_id = album.id
-      album.id = album.duplicate_of_id
-      album.duplicate_of_id = nil
-      album.save
-      
-      original.id = duplicate_id
-      original.duplicate_of_id = album.id
-      original.save
+    # If original doesn't have a master_id, try re-fetching it
+    if original.discogs_master_id.blank?
+      original_release = DiscogsYu.find_by_id(album.discogs_release_id)
+      original.update_attributes(discogs_master_id: original_release.master_id) if original_release.try(:master_id)
     end
+    
+    album.update_attributes(duplicate_of_id: original.id)
   end
-  
+
+  def find_original(album)
+    # Try finding the original either by master_id or by label+catnum+title
+    # This might not catch every original, but it will not catch false ones
+    original = Album.original.where("id != ?", album.id).where(discogs_master_id: album.discogs_master_id).first if album.discogs_master_id
+    original ||= Album.original.where("id != ?", album.id).where("catnum != 'NONE'").where(label: album.label, catnum: album.catnum, title: album.title).first
+  end
+      
 end

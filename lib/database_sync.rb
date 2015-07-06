@@ -43,29 +43,10 @@ class DatabaseSync
 end
 
 
-
 class ProductionAlbum < Album
-  establish_connection(
-    adapter: "postgresql",
-    host: '163.47.63.206',
-    port: 5432,
-    encoding: 'utf8',
-    username: "app",
-    password: ENV['PRODUCTION_DATABASE_PASSWORD'],
-    database: "db13099"
-  )
-  
+  establish_connection(:production)  
 end
 
 class ProductionUserRating < UserRating
-  establish_connection(
-    adapter: "postgresql",
-    host: '163.47.63.206',
-    port: 5432,
-    encoding: 'utf8',
-    username: "app",
-    password: ENV['PRODUCTION_DATABASE_PASSWORD'],
-    database: "db13099"
-  )
-  
+  establish_connection(:production)  
 end

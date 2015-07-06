@@ -21,6 +21,7 @@ module DiscogsYu
   
   def self.find_by_id(id)
     return nil unless id
+    sleep(0.5) # TODO: make this smarter
     discogs.get_release(id)
   rescue Discogs::UnknownResource => e
     p "Couldn't find: #{id}"

@@ -4,7 +4,7 @@ class Album < ActiveRecord::Base
   scope :original, -> { where(duplicate_of_id: nil) }
   scope :of_interest, -> { original.where(in_yu: true) }
   scope :non_discogs, -> { where(discogs_release_id: nil) }
-  scope :downloaded, -> { where("download_url IS NOT NULL") }
+  scope :uploaded, -> { where("download_url IS NOT NULL") }
   
   def self.random
     order("RAND()").first
@@ -56,6 +56,10 @@ class Album < ActiveRecord::Base
   def calculate_average_rating
     self.average_rating = 1.0 * user_ratings.sum("rating") / user_ratings.count if user_ratings.present?
     save
+  end
+  
+  def info_attributes
+    attributes.slice("label", "catnum", "year", "artist", "title", "discogs_release_id", "discogs_master_id", "info_url", "image_url", "tracks")
   end
   
 end

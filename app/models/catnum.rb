@@ -29,4 +29,10 @@ module Catnum
     catnum.strip.gsub(/[\s-]+/, "-").to_lat.upcase
   end
   
+  def self.next(catnum)
+    number = catnum.scan(/\d+/).last
+    return nil if number.nil?
+    next_number = (number.to_i + 1).to_s.rjust(number.to_s.length, "0")
+    catnum.reverse.gsub(number.reverse, next_number.reverse).reverse # Replace last occurence
+  end
 end

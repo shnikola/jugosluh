@@ -10,14 +10,14 @@
       margin: auto;
     }
     
-    .listened, .downloaded {
+    .listened, .uploaded {
       position: absolute;
       top: 0; left: 0;
       height: 100%;
     }
     
     .listened { background-color: #4db849;}
-    .downloaded { background-color: #0078e7;}
+    .uploaded { background-color: #0078e7;}
     
     .legend {
       margin-top: 5px;

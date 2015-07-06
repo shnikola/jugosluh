@@ -18,7 +18,7 @@ class Downloader
       if file_name
         folder = extract_file(source, file_name)
         check_downloaded(source, folder)
-        p "Success [#{file_name}]"
+        p "#{source.status.humanize} [#{file_name}]"
       else
         source.download_failed!
         p "Failed :("
@@ -44,6 +44,9 @@ class Downloader
       `mv #{extracted.first.shellescape}/* #{folder}/ && rm -r #{extracted.first.shellescape}`
     end
     
+    # Fix permissions
+    `chmod --recursive 777 "#{folder}"`
+     
     # Clean up crud
     `find "#{folder}" -name '*.db' -delete`
     `find "#{folder}" -name '*.ico' -delete`
