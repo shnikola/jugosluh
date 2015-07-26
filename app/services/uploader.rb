@@ -1,11 +1,11 @@
 class Uploader
   
-  CURRENT_DRIVE_ID = 4
+  CURRENT_DRIVE_ID = 7
   
   def start(*ids)
     sources = Source.downloaded
     sources.where!(album_id: ids) if ids.present?
-    sources.order("download_url").each do |source|
+    sources.joins(:album).order("year").where("year > 0").each do |source|
       album = source.album
       next if album.uploaded? || !album.in_yu?
 
@@ -27,9 +27,11 @@ class Uploader
     return nil if !success
     
     result = `#{drive_program} pub '#{upload_path}/#{album.id}'`
-    folder_id = result.match(/Published on https:\/\/googledrive.com\/host\/(.*)$/).try(:[], 1)
-    "https://drive.google.com/folderview?id=#{folder_id}"
+    folder_id = result.match(/https:\/\/googledrive.com\/host\/(.*)$/).try(:[], 1)
+    "https://drive.google.com/folderview?id=#{folder_id}" if folder_id
   end
+  
+  private
   
   def download_path
     "#{Rails.root}/tmp/downloads"

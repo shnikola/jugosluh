@@ -15,6 +15,7 @@ class Cleaner
   def select_best_original
     Album.where("duplicate_of_id IS NOT NULL").find_each do |duplicate|
       original = duplicate.original
+
       if better_info?(duplicate, original)
         duplicate_attrs, original_attrs = duplicate.info_attributes, original.info_attributes
         p "Switching #{original.id} - #{duplicate.id}"
@@ -28,6 +29,7 @@ class Cleaner
   
   def better_info?(duplicate, original)
     # If the duplicate was out earlier than the original
-    duplicate.year? && duplicate.year < original.year
+    (duplicate.year? && duplicate.year < original.year) ||
+    (duplicate.year == original.year && duplicate.catnum.start_with?('L') && !original.catnum.start_with?('L'))
   end
 end

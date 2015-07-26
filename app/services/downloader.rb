@@ -7,7 +7,7 @@ class Downloader
   
   def start(from_id = nil)
     Source.to_download.where("id >= ?", from_id || 0).find_each do |source|
-      if source.album.uploaded?
+      if Source.downloaded.where(album_id: source.album_id).exists?
         source.downloaded!
         next
       end
@@ -45,7 +45,7 @@ class Downloader
     end
     
     # Fix permissions
-    `chmod --recursive 777 "#{folder}"`
+    `chmod -R 777 "#{folder}"`
      
     # Clean up crud
     `find "#{folder}" -name '*.db' -delete`

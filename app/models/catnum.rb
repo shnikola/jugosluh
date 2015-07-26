@@ -19,7 +19,7 @@ module Catnum
     elsif line =~ /Suzy/i
       catnum = line.match(/Suzy(?:[\s,–-]+Zagreb)?(?:[\s,–-]+records)?[\s,–-]+(\w+[\s–-]*\w?[\s–-]*\d+)/i).try(:[], 1)
     elsif line =~ /RTB/i
-      catnum = line.match(/(?:PGP[ -])?RTB|S(?:[\s,–-]+Beograd)?[\s–,-]*(\w*(?:[\s–-]+I+)?(?:[\s–-]+[\d]+)+)/i).try(:[], 1)
+      catnum = line.match(/(?:PGP[ -])?(?:RTB|S)(?:[\s–-]+PGP)?(?:[\s,–-]+Beograd)?[\s–,-]*(\w*(?:[\s–-]+I+)?(?:[\s–-]+[\d]+)+)/i).try(:[], 1)
     end
     
     normalize(catnum) if catnum.present?

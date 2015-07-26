@@ -11,56 +11,54 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150410170827) do
+ActiveRecord::Schema.define(version: 20150723084242) do
 
-  create_table "album_issues", force: true do |t|
-    t.integer  "album_id"
-    t.integer  "user_id"
-    t.text     "message"
+  create_table "album_issues", force: :cascade do |t|
+    t.integer  "album_id",   limit: 4
+    t.integer  "user_id",    limit: 4
+    t.text     "message",    limit: 65535
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  create_table "albums", force: true do |t|
-    t.string  "label"
-    t.string  "catnum"
-    t.integer "year"
+  create_table "albums", force: :cascade do |t|
+    t.string  "label",              limit: 255
+    t.string  "catnum",             limit: 255
+    t.integer "year",               limit: 4
     t.string  "artist",             limit: 500
     t.string  "title",              limit: 500
-    t.string  "duplicate_of_id"
-    t.string  "discogs_release_id"
-    t.string  "discogs_master_id"
+    t.string  "duplicate_of_id",    limit: 255
+    t.string  "discogs_release_id", limit: 255
+    t.string  "discogs_master_id",  limit: 255
     t.string  "info_url",           limit: 700
-    t.string  "download_url"
+    t.string  "download_url",       limit: 255
+    t.string  "image_url",          limit: 255
     t.boolean "in_yu"
-    t.boolean "incorrect",                      default: false
-    t.integer "tracks"
-    t.integer "drive_id"
+    t.integer "tracks",             limit: 4
+    t.integer "drive_id",           limit: 4
     t.float   "average_rating",     limit: 24
-    t.string  "image_url"
   end
 
   add_index "albums", ["catnum"], name: "index_albums_on_catnum", using: :btree
   add_index "albums", ["discogs_release_id"], name: "index_albums_on_discogs_release_id", using: :btree
 
-  create_table "sources", force: true do |t|
-    t.string   "artist"
-    t.string   "title"
-    t.string   "catnum"
-    t.text     "details"
-    t.string   "download_url"
-    t.boolean  "in_yu",        default: true
+  create_table "sources", force: :cascade do |t|
+    t.string   "artist",       limit: 255
+    t.string   "title",        limit: 255
+    t.string   "catnum",       limit: 255
+    t.text     "details",      limit: 65535
+    t.string   "download_url", limit: 255
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "album_id"
-    t.integer  "status",       default: 0
+    t.integer  "album_id",     limit: 4
+    t.integer  "status",       limit: 4,     default: 0
   end
 
-  create_table "user_ratings", force: true do |t|
-    t.integer  "user_id"
-    t.integer  "album_id"
-    t.integer  "rating"
-    t.text     "comment"
+  create_table "user_ratings", force: :cascade do |t|
+    t.integer  "user_id",    limit: 4
+    t.integer  "album_id",   limit: 4
+    t.integer  "rating",     limit: 4
+    t.text     "comment",    limit: 65535
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -68,18 +66,18 @@ ActiveRecord::Schema.define(version: 20150410170827) do
   add_index "user_ratings", ["album_id"], name: "index_user_ratings_on_album_id", using: :btree
   add_index "user_ratings", ["user_id"], name: "index_user_ratings_on_user_id", using: :btree
 
-  create_table "users", force: true do |t|
-    t.string   "name"
-    t.string   "email",                  default: "", null: false
-    t.string   "encrypted_password",     default: "", null: false
-    t.string   "reset_password_token"
+  create_table "users", force: :cascade do |t|
+    t.string   "name",                   limit: 255
+    t.string   "email",                  limit: 255, default: "", null: false
+    t.string   "encrypted_password",     limit: 255, default: "", null: false
+    t.string   "reset_password_token",   limit: 255
     t.datetime "reset_password_sent_at"
     t.datetime "remember_created_at"
-    t.integer  "sign_in_count",          default: 0,  null: false
+    t.integer  "sign_in_count",          limit: 4,   default: 0,  null: false
     t.datetime "current_sign_in_at"
     t.datetime "last_sign_in_at"
-    t.string   "current_sign_in_ip"
-    t.string   "last_sign_in_ip"
+    t.string   "current_sign_in_ip",     limit: 255
+    t.string   "last_sign_in_ip",        limit: 255
     t.datetime "created_at"
     t.datetime "updated_at"
   end

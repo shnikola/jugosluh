@@ -9,7 +9,6 @@ class Collector
   
   def finalize_source(source)
     connect_to_album(source)
-    set_status(source)
   end
     
   def connect_to_album(source)
@@ -17,19 +16,13 @@ class Collector
     album_by_title = Album.find_original_by_title(source.title) if source.title.present?
     
     if album_by_catnum && album_by_title && album_by_catnum != album_by_title
-      p "DIFF: #{album_by_catnum.title} (#{album_by_catnum.id}) :: #{album_by_title.title} (#{album_by_title.id}) [#{source.title}]"
-    end
+      p "  Possible Albums: #{album_by_catnum} (#{album_by_catnum.id}) :: #{album_by_title} (#{album_by_title.id})"
+      source.update_attributes(album_id: album_by_catnum.id)
     
-    album_id = (album_by_catnum || album_by_title).try(:id)
-    p "CONN: #{source.id}: #{album_id}" if album_id
-    source.update_attributes(album_id: album_id) if album_id
-  end
-  
-  def set_status(source)
-    if source.title.include?(/199[2-9]/) || source.title.include?(/20\d\d/)
-      source.skipped!
-    else
-      source.confirmed!
+    elsif album_by_catnum || album_by_title
+      album = album_by_catnum || album_by_title
+      p "  Album Recognized: #{album}"
+      source.update_attributes(album_id: album.id)
     end
   end
   

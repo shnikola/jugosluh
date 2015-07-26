@@ -75,10 +75,11 @@ class Downloader
     def get_mega_co_nz(url)
       watir_download(30) do
         browser.goto url
-        sleep 5
+        sleep 3
         browser.execute_script("window.onbeforeunload = null;") # Disable prompts
         browser.execute_script("localStorage.setItem('noOverlay', true);") # Disable overlay
-
+        sleep 2
+        
         browser.div(class: 'new-download-button-txt2').when_present.click
         sleep 5
       
