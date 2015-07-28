@@ -4,7 +4,7 @@ working_directory "/home/jugosluh/current"
 
 # Unicorn PID file location
 # pid "/path/to/pids/unicorn.pid"
-pid "/home/jugosluh/current/pids/unicorn.pid"
+pid "/home/jugosluh/current/tmp/pids/unicorn.pid"
 
 # Path to logs
 # stderr_path "/path/to/log/unicorn.log"
