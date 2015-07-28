@@ -13,7 +13,7 @@ stderr_path "/home/jugosluh/current/log/unicorn.log"
 stdout_path "/home/jugosluh/current/log/unicorn.log"
 
 # Unicorn socket
-listen "/tmp/unicorn.jugosluh.sock"
+listen "127.0.0.1:8080"
 
 # Number of processes
 # worker_processes 4
