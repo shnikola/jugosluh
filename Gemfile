@@ -36,6 +36,9 @@ gem 'watir-webdriver'
 
 gem 'devise'
 
+gem 'mina'
+gem 'mina-unicorn', :require => false
+
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 

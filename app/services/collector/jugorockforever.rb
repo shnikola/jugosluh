@@ -35,7 +35,8 @@ class Collector
         title: title,
         artist: artist,
         details: details,
-        download_url: download_url
+        download_url: download_url,
+        origin_site: 'jugorockforever.blogspot.com'
       )
       
       finalize_source(source)

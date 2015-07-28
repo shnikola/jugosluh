@@ -33,6 +33,7 @@ class Importer
       duplicate_of_id: original_id,
       discogs_release_id: release.id,
       discogs_master_id: release.master_id,
+      discogs_catnum: label_info.catno,
       info_url: release.uri,
       image_url: select_image_url(release.images),
       tracks: select_tracks(release.tracklist)

@@ -72,7 +72,8 @@ class Collector
           artist: artist,
           catnum: Catnum.guess(clean_lines[0]) || Catnum.guess(clean_lines[1]),
           details: clean_lines.join("\n"),
-          download_url: download_url
+          download_url: download_url,
+          origin_site: 'smboemi.com'
         )
         
         p "...SUCCESS."
