@@ -1,0 +1,9 @@
+%tr{ class: album_row_class(user_list_album.album) }
+  %td.artist= user_list_album.album.artist
+  %td.title= link_to user_list_album.album.title, user_list_album.album
+  %td.year= user_list_album.album.year
+  %td.label #{user_list_album.album.label} #{user_list_album.album.catnum}
+  %td.info= link_to "Discogs", user_list_album.album.info_url, target: '_blank' if user_list_album.album.info_url
+  %td.ratings
+    - album.user_ratings.each do |user_rating|
+      .rating{class: "r-#{user_rating.rating}"}= user_rating.rating

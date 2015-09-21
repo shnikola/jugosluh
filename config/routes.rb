@@ -10,5 +10,7 @@ Rails.application.routes.draw do
 
   resources :users, only: [:show]
   resources :user_ratings, only: [:create, :edit, :update, :destroy]
+  resources :user_lists, only: [:index, :show, :create, :destroy]
+  resources :user_list_albums, only: [:new, :create, :destroy]
   resources :album_issues, only: [:index, :new, :create]
 end

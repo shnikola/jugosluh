@@ -17,7 +17,7 @@ class Collector
       title = post.css(".post-title").text.strip
       artist = title.split("-").first.strip.downcase.capitalize
       details = post.css(".post-body").text.gsub(/download/i, "").strip.squish
-      download_link = post.css('a[href*="mega.co.nz"]').first ||
+      download_link = post.css('a[href*="mega.co.nz"], a[href*="mega.nz"]').first ||
         post.css("a[href*=solidfiles]").first ||
         post.css("a[href*=file-upload]").first ||
         post.css("a[href*=zippyshare]").first ||

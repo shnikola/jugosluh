@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150726093059) do
+ActiveRecord::Schema.define(version: 20150801124131) do
 
   create_table "album_issues", force: :cascade do |t|
     t.integer  "album_id",   limit: 4
@@ -30,14 +30,14 @@ ActiveRecord::Schema.define(version: 20150726093059) do
     t.string  "duplicate_of_id",    limit: 255
     t.string  "discogs_release_id", limit: 255
     t.string  "discogs_master_id",  limit: 255
+    t.string  "discogs_catnum",     limit: 255
     t.string  "info_url",           limit: 700
-    t.string  "download_url",       limit: 255
     t.string  "image_url",          limit: 255
     t.boolean "in_yu"
     t.integer "tracks",             limit: 4
+    t.string  "download_url",       limit: 255
     t.integer "drive_id",           limit: 4
     t.float   "average_rating",     limit: 24
-    t.string  "discogs_catnum",     limit: 255
   end
 
   add_index "albums", ["catnum"], name: "index_albums_on_catnum", using: :btree
@@ -54,6 +54,22 @@ ActiveRecord::Schema.define(version: 20150726093059) do
     t.integer  "album_id",     limit: 4
     t.integer  "status",       limit: 4,     default: 0
     t.string   "origin_site",  limit: 255
+  end
+
+  create_table "user_list_albums", force: :cascade do |t|
+    t.integer  "user_list_id", limit: 4
+    t.integer  "album_id",     limit: 4
+    t.text     "note",         limit: 65535
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "user_lists", force: :cascade do |t|
+    t.integer  "user_id",                limit: 4
+    t.string   "name",                   limit: 255
+    t.integer  "user_list_albums_count", limit: 4
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "user_ratings", force: :cascade do |t|

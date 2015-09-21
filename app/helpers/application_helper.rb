@@ -14,6 +14,10 @@ module ApplicationHelper
      (bar + legend).html_safe
   end
   
+  def album_row_class(album)
+    "#{'uploaded' if album.uploaded?} #{'listened' if album.user_ratings.any?{|ur| ur.user_id == current_user.id}}"
+  end
+  
   def decade_options
     [["Sva", nil], "50", "60", "70", "80", "90"]
   end
@@ -24,5 +28,4 @@ module ApplicationHelper
     sort_params = params.except(:page).merge(sort: column, direction: direction)
     link_to title, sort_params
   end
-
 end

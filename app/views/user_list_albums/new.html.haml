@@ -1,0 +1,22 @@
+.new-user-list-album-page
+  %h3 Dodaj u listu
+  %h4= @album
+
+  = form_for(@user_list_album, html: {class: 'user-list-album-form'}) do |f|
+    = f.hidden_field :album_id
+
+    .form-row
+      - if current_user.user_lists.present?
+        = f.label :user_list_id, "Odaberi listu"
+        = f.select :user_list_id, current_user.user_lists.map{|l| [l.name, l.id] }
+        = f.label :new_list, "ili"
+
+      = f.label :new_list, "Stvori novu listu"
+      = text_field_tag :new_list
+
+    .form-row
+      = f.label :note, "Bilješka"
+      = f.text_area :note
+
+    .form-actions
+      = f.submit "Dodaj", class: "pure-button pure-button-primary"

@@ -4,23 +4,24 @@
     %h3= link_to @album.artist, albums_path(search: @album.artist)
     = image_tag @album.image_url, class: 'album-image' if @album.image_url.present?
     %h2= @album.title
-      
+
     .details
       #{@album.label}, #{@album.catnum}, #{@album.year}.
-    
+
     .album-buttons
       = link_to "Info", @album.info_url, target: '_blank', class: 'pure-button' if @album.info_url
       = link_to "Play", @album.download_url, data: {popup: true}, class: 'pure-button pure-button-primary' if @album.download_url
+      .add-to-list=link_to "Dodaj na listu", new_user_list_album_path(album_id: @album.id)
       .report=link_to "Prijavi pogrešku", new_album_issue_path(album_id: @album.id)
-    
+
   %section.album-comments
     %h3 Recenzije
-    
+
     - if @album.user_ratings.empty?
       .no-comments Nitko još nije recenzirao album.
-      
+
     - @album.user_ratings.includes(:user).order("created_at").each do |user_rating|
       = render partial: 'albums/user_rating', object: user_rating
-  
+
     - if !current_user.rated_album?(@album)
       = render 'rating_form'

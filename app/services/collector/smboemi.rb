@@ -53,7 +53,7 @@ class Collector
         end
         
         mega_id = text.match(/](!.+)/)[1].strip
-        download_url = "http://mega.co.nz/##{mega_id}"
+        download_url = "https://mega.co.nz/##{mega_id}"
         
         if Source.where(download_url: download_url).exists?
           p "...Already collected."
