@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
-  
+
   devise_for :users
-  
+
   root 'home#index'
 
   resources :albums, only: [:index, :show] do

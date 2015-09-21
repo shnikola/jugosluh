@@ -2,4 +2,4 @@
 - if user_signed_in?
   .user-menu
     Prijavljen kao #{link_to current_user.name, current_user}.
-    = link_to 'Odjavi se?', destroy_user_session_path, :method => :delete
+    = link_to 'Odjavi se?', destroy_user_session_path
