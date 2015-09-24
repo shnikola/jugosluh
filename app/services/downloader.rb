@@ -6,7 +6,7 @@ class Downloader
   include Downloader::Domains
 
   def start(from_id = nil)
-    Source.to_download.where("id >= ?", from_id || 0).where("download_url LIKE '%media%'").find_each do |source|
+    Source.to_download.where("id >= ?", from_id || 0).find_each do |source|
       if Source.downloaded.where(album_id: source.album_id).exists?
         source.downloaded!
         next

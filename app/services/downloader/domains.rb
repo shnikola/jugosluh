@@ -7,7 +7,7 @@ class Downloader
 
     def get_file(url)
       case url
-        when /mega\.co\.nz/ then get_mega_co_nz(url)
+        when /mega(\.co)?\.nz/ then get_mega_nz(url)
         when /mediafire\.com/ then get_mediafire_com(url)
         when /senspace\.com/ then get_sendspace_com(url)
         when /divshare\.com/ then get_divshare_com(url)
@@ -70,7 +70,7 @@ class Downloader
       end
     end
 
-    def get_mega_co_nz(url)
+    def get_mega_nz(url)
       watir_download(30) do
         browser.cookies.clear
         browser.goto url

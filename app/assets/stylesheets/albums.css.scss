@@ -1,27 +1,27 @@
 .albums-page {
-  
+
   .filter {
     label {
       margin: 0 15px;
     }
   }
-  
+
   .albums {
     table {
       width: 80%;
       margin: auto;
-      text-align: left;  
+      text-align: left;
     }
-    
+
     .label, .ratings {
       word-break: keep-all;
       white-space: nowrap;
     }
-    
+
     .ratings {
       text-align: center;
     }
-    
+
     .ratings .rating {
       display: inline-block;
       width: 30px; height: 30px; line-height: 30px;
@@ -31,32 +31,36 @@
     .pagination {
       margin: 20px 0;
     }
-  
+
   }
 }
 
 .album-page {
-  
+
   h4 { margin: 25px 0 5px 0;}
-  
+
   .album-image {
     max-width: 400px;
   }
-  
+
+  .playlist-form {
+    display: inline-block;
+  }
+
   .details {
     margin-bottom: 10px;
   }
-  
+
   .add-to-list {
     font-size: 13px;
-    margin: 10px 0;    
+    margin: 10px 0;
   }
-  
+
   .report {
     font-size: 13px;
     margin: 10px 0;
   }
-  
+
   .user-rating {
     .edit {
       font-size: 13px;

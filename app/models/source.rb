@@ -18,7 +18,7 @@ class Source < ActiveRecord::Base
   def possible_albums
     possible = []
     possible << Album.find_original_by_catnum(catnum) if catnum.present?
-    #possible << Album.find_original_by_title(title) if title.present?
+    possible << Album.find_original_by_title(title) if title.present?
     possible.compact.uniq
   end
 end

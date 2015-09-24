@@ -1,10 +1,10 @@
 class Uploader
 
-  CURRENT_DRIVE_ID = 14
+  CURRENT_DRIVE_ID = 15
 
   def start(*ids)
     ids = Source.downloaded.pluck(:album_id) if ids.empty?
-    Album.where(id: ids).where.not(label: ["Diskos", "Jugodisk", "Beograd Disk", "Diskoton"]).where("year > 0").order("year").each do |album|
+    Album.where(id: ids).where.not(label: ["Diskos", "Diskoton"]).where("year > 0").order("year").each do |album|
       next if album.uploaded? || !album.in_yu?
 
       print "Uploading #{album.id} [#{album.full_info}]\n"

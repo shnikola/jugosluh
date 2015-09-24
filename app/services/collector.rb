@@ -2,6 +2,10 @@ class Collector
   include Collector::Smboemi
   include Collector::Jugorockforever
 
+  def initialize(**options)
+    @trace = options[:trace]
+  end
+
   def start
     smboemi_crawl
     jugorockforever_crawl

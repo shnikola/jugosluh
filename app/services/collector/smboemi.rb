@@ -2,27 +2,22 @@ require "open-uri"
 
 class Collector
   module Smboemi
-  
+
     def smboemi_crawl
       page_ids = [
-        35..57,
-        62..84,
-        103..124,
-        131..152,
-        277..297,
-        375..396,
-        424..445,
-        469..472,
-        514..517,
-        540..542
-      ].map(&:to_a).sum + [
-        188,
-        215,
-        269,
-        548,
-        551
-      ]
-      
+        35..57, 188,  # Diskografije/kolekcije zabavnjaka
+        62..84, 215,  # Razni albumi i singlice
+        103..124,     # Diskografije Narodne muzike
+        131..152,     # Duetska izdanja
+        276..297,     # Kolekcije, kompilacije, Noviteti
+        375..396,     # Izvorna i krajiska muzika
+        424..445,     # Narodna kola i igre
+        515..517,     # Sevdalinke i starogradska muzika
+        469..474, 514, 540..542, 551,  # Ripovi ostalih najpoznatijih ripera kod nas
+        269,          # Novi clanovi nude Narodnu muziku
+        548,          # Novi clanovi nude Zabavnu muziku
+        349,          # Muzika za decu
+      ].map{|i| Array(i) }.sum
       page_ids.each do |id|
         noko = Nokogiri::HTML(open("http://www.smboemi.com/archive/index.php/f-#{id}.html"))
         noko.css("#content a").each do |thread_link|
@@ -36,37 +31,42 @@ class Collector
       post_title = noko.css(".largefont a").text
       artist = post_title.match(/(.*) - (diskografija|kolekcija)/i).try(:[], 1).try(:strip)
       artist ||= post_title.split("-")[0].gsub(/\d{4}/, '').strip
-      
-      p "Artist: #{artist}"
-      
+
+      print "Artist: #{artist}\n" if @trace
+
       noko.css(".posttext").each do |content|
         text = content.text.encode("utf-8", invalid: :replace, undef: :replace, replace: '?')
-        
-        clean_lines = text.lines.map(&:strip).reject{|l| l.blank? || l.start_with?("[Samo") || l.match(/^-+$/)}
+
+        clean_lines = text.lines.map(&:strip).reject{|l| l.blank? || l.start_with?("[Samo") || l.match(/^[\.-]+$/)}
         title = clean_lines.first || ""
-        
-        print "  Searching #{title} "
-        
+
+        print "  Searching #{title} " if @trace
+
         unless text.include? "]!"
-          p "...No link found."
+          print "...No link found.\n" if @trace
           next
         end
-        
+
         mega_id = text.match(/](!.+)/)[1].strip
         download_url = "https://mega.co.nz/##{mega_id}"
-        
+
         if Source.where(download_url: download_url).exists?
-          p "...Already collected."
+          print "...Already collected.\n" if @trace
           next
         end
-                
-        year = title.match(/\D((?:19|20)\d\d)\D/).try(:[], 1).to_i
-        
+
+        if title =~ /^\d{3}\s*kbps$/i
+          print "...No title found.\n" if @trace
+          next
+        end
+
+        year = title.match(/\b((?:19|20)\d\d)\b/).try(:[], 1).to_i
+
         if year > 1992
-          p "...Not in YU."
+          print "...Not in YU.\n"  if @trace
           next
         end
-        
+
         source = Source.create(
           title: title.first(255),
           artist: artist,
@@ -75,13 +75,18 @@ class Collector
           download_url: download_url,
           origin_site: 'smboemi.com'
         )
-        
-        p "...SUCCESS."
-        
+
+        if @trace
+          print "...SUCCESS.\n"
+        else
+          print "FOUND: #{artist} : #{title}\n"
+        end
+
+
         source.confirmed! if year.between?(1900, 1992)
         finalize_source(source)
       end
     end
-    
+
   end
 end
