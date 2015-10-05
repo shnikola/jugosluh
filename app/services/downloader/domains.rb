@@ -82,9 +82,12 @@ class Downloader
         return nil if browser.div(class: 'not-available-some-reason').present?
 
         browser.div(class: 'new-download-red-button').when_present.click
-        sleep 5
 
-        return nil if browser.div(class: 'temporary-error').present?
+        # Check if error message appears
+        3.times do
+          sleep 10
+          return nil if browser.div(class: 'temporary-error').present?
+        end
 
         browser.div(class: 'download-complete-icon').wait_until_present(600)
       end
@@ -136,9 +139,9 @@ class Downloader
         }
       }
 
-      # Use Ad Block
+      # Use uBlock Origin
       switches = [
-        '--load-extension=/Users/nikola/Library/Application Support/Google/Chrome/Default/Extensions/cfhdojbkjhnklbpkdaibdccddilifddb/1.9.1_0'
+        '--load-extension=/Users/nikola/Library/Application Support/Google/Chrome/Default/Extensions/cjpalhdlnbpafiamejdnhcphjbkeiagm/1.1.1_0'
       ]
 
       {desired_capabilities: caps, switches: switches}

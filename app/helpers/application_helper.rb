@@ -19,7 +19,7 @@ module ApplicationHelper
   end
 
   def album_playlist_link(label, url, options = {})
-    form_tag("http://tiki.droba.org/", method: :post, target: '_blank', class: 'playlist-form') do
+    form_tag("http://sluh.droba.org/", method: :post, target: '_blank', class: 'playlist-form') do
       hidden_field_tag(:drive_dir_url, url) +
       submit_tag(label, options)
     end
