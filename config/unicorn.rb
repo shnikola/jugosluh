@@ -17,7 +17,7 @@ listen "127.0.0.1:8080"
 
 # Number of processes
 # worker_processes 4
-worker_processes 2
+worker_processes 1
 
 # Time-out
 timeout 30
