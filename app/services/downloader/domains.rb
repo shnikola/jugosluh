@@ -141,7 +141,7 @@ class Downloader
 
       # Use uBlock Origin
       switches = [
-        '--load-extension=/Users/nikola/Library/Application Support/Google/Chrome/Default/Extensions/cjpalhdlnbpafiamejdnhcphjbkeiagm/1.1.1_0'
+        '--load-extension=/Users/nikola/Library/Application Support/Google/Chrome/Default/Extensions/cjpalhdlnbpafiamejdnhcphjbkeiagm/1.5.3_0'
       ]
 
       {desired_capabilities: caps, switches: switches}

@@ -12,16 +12,16 @@ class Downloader
         next
       end
 
-      p "Downloading #{source.id} [#{source.album}]"
+      print "Downloading #{source.id} [#{source.album}]\n"
       file_name = get_file(source.download_url)
 
       if file_name
         folder = extract_file(source, file_name)
         check_downloaded(source, folder)
-        p "#{source.status.humanize} [#{file_name}]"
+        print "#{source.status.humanize} [#{file_name}]\n".send(source.downloaded? ? :green : :yellow)
       else
         source.download_failed!
-        p "Failed :("
+        print "Failed :(\n".red
       end
     end
   end

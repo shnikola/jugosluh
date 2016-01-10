@@ -1,6 +1,6 @@
 class Uploader
 
-  CURRENT_DRIVE_ID = 16
+  CURRENT_DRIVE_ID = 17
 
   def start(*ids)
     ids = Source.downloaded.pluck(:album_id) if ids.empty?
@@ -12,9 +12,9 @@ class Uploader
 
       if download_url.present?
         album.update_attributes(download_url: download_url, drive_id: CURRENT_DRIVE_ID)
-        print "  Success\n"
+        print "  Success\n".green
       else
-        print "  Failed :(\n"
+        print "  Failed :(\n".red
       end
     end
   end

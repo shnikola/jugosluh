@@ -43,9 +43,9 @@ class Collector
       )
 
       if @trace
-        print "...SUCCESS.\n"
+        print "...Success.\n".green
       else
-        print "FOUND: #{artist} : #{title}\n"
+        print "Found: #{artist} : #{title}\n".green
       end
 
       if title =~ /\b(19\d\d)-(19)?\d\d\b/ || title =~ /\bdemo\b/i
@@ -54,7 +54,7 @@ class Collector
         source.confirmed!
       end
 
-      finalize_source(source)
+      add_to_collected(source)
     end
 
   end

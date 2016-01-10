@@ -77,14 +77,14 @@ class Collector
         )
 
         if @trace
-          print "...SUCCESS.\n"
+          print "...Success.\n".green
         else
-          print "FOUND: #{artist} : #{title}\n"
+          print "Found: #{artist} : #{title}\n".green
         end
 
 
         source.confirmed! if year.between?(1900, 1992)
-        finalize_source(source)
+        add_to_collected(source)
       end
     end
 

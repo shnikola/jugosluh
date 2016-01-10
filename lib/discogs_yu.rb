@@ -1,5 +1,5 @@
 module DiscogsYu
-  
+
   def self.find_each
     options = {country: 'yugoslavia', type: 'release'}
     options.merge!(per_page: 100, page: 1)
@@ -18,7 +18,7 @@ module DiscogsYu
       end
     end
   end
-  
+
   def self.find_by_id(id)
     return nil unless id
     sleep(0.5) # TODO: make this smarter
@@ -30,19 +30,19 @@ module DiscogsYu
     p "#{e}, retrying..."
     retry
   end
-  
-  def self.find_by_name(name)
+
+  def self.search_by_name(name, size = 10)
     options = {country: 'yugoslavia', type: 'release'}
-    options.merge!(per_page: 3, page: 1)
+    options.merge!(per_page: size, page: 1)
     begin
       response = discogs.search(name, options)
     rescue EOFError, OpenSSL::SSL::SSLError, Errno::ECONNRESET => e
       p "#{e}, retrying..."
       retry
     end
-    response.results.first
+    response.results
   end
-  
+
   def self.discogs
     @@discogs ||= Discogs::Wrapper.new("Jugosluh", app_key: "IjTxrhRngvXjeNYPCuUa", app_secret: "kKiEXNKaZDuCroWaoHJZOIkDoWyQBYBn")
   end

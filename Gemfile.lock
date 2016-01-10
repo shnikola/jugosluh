@@ -55,6 +55,7 @@ GEM
       coffee-script-source
       execjs
     coffee-script-source (1.9.1.1)
+    colorize (0.7.7)
     cyrillizer (0.2.1)
     devise (3.5.1)
       bcrypt (~> 3.0)
@@ -218,6 +219,7 @@ PLATFORMS
 DEPENDENCIES
   activerecord-import
   coffee-rails (~> 4.0.0)
+  colorize
   cyrillizer
   devise
   discogs-wrapper

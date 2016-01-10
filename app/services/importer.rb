@@ -3,22 +3,42 @@ require 'cyrillizer'
 class Importer
 
   def start
+    imported = []
     DiscogsYu.find_each do |release|
       next if Album.where(discogs_release_id: release.id).exists?
-      print "Importing #{release.id} [#{release.title}]\n"
-      full_release = DiscogsYu.find_by_id(release.id)
-      save_to_db(full_release) if full_release
+      album = import_release(release)
+      imported << album if album
     end
+
+    Cleaner.new.after_import(imported.map(&:id))
+  end
+
+  def import_release(release)
+    print "Importing #{release.id} [#{release.title}]\n"
+    full_release = DiscogsYu.find_by_id(release.id)
+    save_to_db(full_release) if full_release
   end
 
   def save_to_db(release)
     label_info = select_label_info(release.labels)
     catnum = Catnum.normalize(label_info.catno)
 
+    if album = Album.find_by(discogs_release_id: release.id)
+      print "  Already imported.\n".yellow
+      # TODO: update some stuff?
+      return album
+    end
+
     # Check by label+catnum if we have the same non-discogs album already in db
     if album = Album.non_discogs.find_by(label: label_info.name, catnum: catnum)
-      print "  Connected to manually.\n"
-      album.update_attributes(discogs_release_id: release.id, discogs_master_id: release.master_id, info_url: release.uri)
+      print "  Connected to manually entered.\n".light_blue
+      album.update_attributes(
+        discogs_release_id: release.id,
+        discogs_master_id: release.master_id,
+        discogs_catnum: label_info.catno,
+        info_url: release.uri,
+        image_url: select_image_url(release.images)
+      )
       return album
     end
 
@@ -37,7 +57,7 @@ class Importer
       image_url: select_image_url(release.images),
       tracks: select_tracks(release.tracklist)
     )
-    print "  New album.\n"
+    print "  New album.\n".green
     check_for_duplicate(album)
     album
   end
@@ -80,6 +100,7 @@ class Importer
     end
 
     album.update_attributes(duplicate_of_id: original.id)
+    print "  Duplicate detected.\n".yellow
   end
 
   def find_original(album)
