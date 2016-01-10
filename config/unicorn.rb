@@ -13,11 +13,11 @@ stderr_path "/home/jugosluh/current/log/unicorn.log"
 stdout_path "/home/jugosluh/current/log/unicorn.log"
 
 # Unicorn socket
-listen "127.0.0.1:8080"
+listen "/tmp/unicorn.jugosluh.sock"
 
 # Number of processes
 # worker_processes 4
-worker_processes 2
+worker_processes 1
 
 # Time-out
 timeout 30
