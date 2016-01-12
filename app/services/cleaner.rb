@@ -4,20 +4,21 @@ class Cleaner
 
   def after_import(album_ids)
     return if album_ids.blank?
+    detect_duplicates(album_ids)
     detect_yu_music(album_ids)
-    select_best_original(album_ids)
     connect_unmatched_sources(album_ids: album_ids)
   end
 
   def detect_yu_music(album_ids = nil)
-    print "Detecting confirmed YU music...\n".on_blue
+    print "\nDetecting confirmed YU music...\n".on_blue
     albums = album_ids ? Album.where(id: album_ids) : Album.all
 
     # All after 1991 is not yu
-    albums.unresolved.where("year > 1991").update_all(in_yu: false)
+    resolved = albums.unresolved.where("year > 1991").update_all(in_yu: false)
+    print "Detected #{resolved} articles after 1991.\n".red
 
     # Assign originals first
-    albums.unresolved.original.where("year != 0").find_each do |album|
+    albums.unresolved.original.where("year IS NOT NULL").find_each do |album|
       if yu_catnum_series?(album.label, album.catnum)
         print "+ #{album.id} #{album.full_info}\n".green
         album.update_attributes(in_yu: true)
@@ -33,26 +34,27 @@ class Cleaner
     end
   end
 
-  def select_best_original(album_ids = nil)
-    print "Selecting best duplicate for original...\n".on_blue
+  def detect_duplicates(album_ids = nil)
+    print "\nDetecting duplicates...\n".on_blue
     albums = album_ids ? Album.where(id: album_ids) : Album.all
 
-    albums.where("duplicate_of_id IS NOT NULL").find_each do |duplicate|
-      original = duplicate.original
-
-      if better_info?(duplicate, original)
-        duplicate_attrs, original_attrs = duplicate.info_attributes, original.info_attributes
-        print "Switching:\n"
-        print "#{original.full_info} (#{original.id})\n".green
-        print "#{duplicate.full_info} (#{duplicate.id})\n".green
+    albums.find_each do |album|
+      next if album.discogs_master_id.blank? || album.download_url?
+      original = Album.original.where("id != ?", album.id).order("id").find_by(discogs_master_id: album.discogs_master_id)
+      next if original.nil?
+      album.update_attributes(duplicate_of_id: original.id)
+      print "Duplicate #{album} (#{album.id}) of #{original} (#{original.id})\n".green
+      if better_info?(album, original)
+        print "Better info in duplicate, switching.\n".blue
+        duplicate_attrs, original_attrs = album.info_attributes, original.info_attributes
         original.update_attributes(duplicate_attrs)
-        duplicate.update_attributes(original_attrs)
+        album.update_attributes(original_attrs)
       end
     end
   end
 
   def connect_unmatched_sources(album_ids: nil, source_ids: nil)
-    print "Connecting unmatched sources...\n".on_blue
+    print "\nConnecting unmatched sources...\n".on_blue
     sources = source_ids ? Source.where(id: source_ids) : Source.all
 
     sources.confirmed.unconnected.find_each do |source|
@@ -70,7 +72,7 @@ class Cleaner
         print "#{album} (#{album.year}) [#{album.id}]\n".yellow
       end
 
-      #source.update_attributes(album_id: album.id)
+      source.update_attributes(album_id: album.id)
     end
   end
 
@@ -85,13 +87,32 @@ class Cleaner
 
   # ==== Listing:
 
-  def list_missing_years
-    # TODO
+  def find_missing_years
+    # Search discogs updates
+    Album.original.maybe_in_yu.where(year: nil).find_each do |album|
+      next if album.discogs_release_id.blank?
+      release = DiscogsYu.find_by_id(album.discogs_release_id)
+      if release.year.to_i > 0
+        album.update(year: release.year)
+        print "#{album} [#{album.year}] (#{album.id})\n\n".green
+      end
+    end
+
+    # Search from sources
+    Source.downloaded.includes(:album).where(albums: {year: nil}).find_each do |source|
+      next if source.album.year? # We might have updated it from a previous source
+      year = source.title.match(/\b(19\d\d)\b/).try(:[], 1)
+      if year
+        print "#{source.album} [#{source.album.year}] (#{source.album.id})\n".yellow
+        print "#{source.title} [#{year}] (#{source.id})\n\n".green
+        source.album.update(year: year)
+      end
+    end
   end
 
   def list_duplicate_catnums
     album_map = Hash.new([])
-    Album.original.where("catnum != ?", 'NONE').where("in_yu IS NULL OR in_yu = 1").find_each do |album|
+    Album.original.maybe_in_yu.where("catnum != ?", 'NONE').find_each do |album|
       album_map[album.label + "#" + album.catnum] += [album]
     end
 
@@ -172,8 +193,9 @@ class Cleaner
     if source.catnum.present?
       album = Album.find_by(catnum: Catnum.normalize(source.catnum)).try(:original)
       possible << album if album
-      # Let's skip searching by name if catnum is found
-      return possible if possible.present?
+      # Let's skip searching other searches if catnum is provided, found or not.
+      # This reduces the number of wrong matches
+      return possible
     end
 
     # Search by name
@@ -199,7 +221,7 @@ class Cleaner
 
   def foreign_artist?(artist)
     return false if artist.blank? || artist =~ /Various|Unknown artist/i
-    artist_albums = Album.original.where(artist: artist, in_yu: false).where("year < 1990 AND year != 0")
+    artist_albums = Album.original.where(artist: artist, in_yu: false).where("year < 1990")
     artist_albums.count > 2
   end
 
@@ -224,7 +246,7 @@ class Cleaner
 
   def better_info?(duplicate, original)
     # If the duplicate was out earlier than the original
-    (duplicate.year? && duplicate.year < original.year) ||
+    (duplicate.year? && (original.year.nil? || duplicate.year < original.year)) ||
     (duplicate.year == original.year && duplicate.catnum.start_with?('L') && !original.catnum.start_with?('L'))
   end
 end

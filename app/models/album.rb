@@ -6,6 +6,7 @@ class Album < ActiveRecord::Base
   scope :non_discogs, -> { where(discogs_release_id: nil) }
   scope :uploaded, -> { where("download_url IS NOT NULL") }
 
+  scope :maybe_in_yu, -> { where("in_yu IS NULL OR in_yu = 1") }
   scope :unresolved, -> { where(in_yu: nil) }
 
   def self.random
@@ -47,7 +48,7 @@ class Album < ActiveRecord::Base
   end
 
   def info_attributes
-    attributes.slice("label", "catnum", "year", "artist", "title", "discogs_release_id", "discogs_master_id", "info_url", "image_url", "tracks")
+    attributes.except("id", "duplicate_of_id", "download_url", "drive_id", "average_rating")
   end
 
 end

@@ -40,10 +40,10 @@ class Downloader
     end
 
     def get_solidfiles_com(url)
-      noko = Nokogiri::HTML(open(url))
-      button = noko.css("#ddl-btn").first
-      file_name = noko.css("#file h1").first.text.strip
-      direct_download(button["href"], file_name) if button
+      watir_download do
+        browser.goto url
+        browser.element(id: 'ddl-text').when_present.click
+      end
     end
 
     def get_sendspace_com(url)
@@ -119,7 +119,7 @@ class Downloader
 
       return nil
     rescue Watir::Wait::TimeoutError => e
-      p "Timeout!"
+      puts "Download Timeout!\n".red
       return nil
     end
 

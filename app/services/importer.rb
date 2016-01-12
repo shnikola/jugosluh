@@ -5,7 +5,7 @@ class Importer
   def start
     imported = []
     DiscogsYu.find_each do |release|
-      next if Album.where(discogs_release_id: release.id).exists?
+      next if latest_version_imported?(release)
       album = import_release(release)
       imported << album if album
     end
@@ -14,7 +14,7 @@ class Importer
   end
 
   def import_release(release)
-    print "Importing #{release.id} [#{release.title}]\n"
+    print "Importing #{release.id} [#{release.title}]... "
     full_release = DiscogsYu.find_by_id(release.id)
     save_to_db(full_release) if full_release
   end
@@ -23,15 +23,9 @@ class Importer
     label_info = select_label_info(release.labels)
     catnum = Catnum.normalize(label_info.catno)
 
-    if album = Album.find_by(discogs_release_id: release.id)
-      print "  Already imported.\n".yellow
-      # TODO: update some stuff?
-      return album
-    end
-
     # Check by label+catnum if we have the same non-discogs album already in db
     if album = Album.non_discogs.find_by(label: label_info.name, catnum: catnum)
-      print "  Connected to manually entered.\n".light_blue
+      print "Connected to manually entered #{album} (#{album.id}).\n".light_blue
       album.update_attributes(
         discogs_release_id: release.id,
         discogs_master_id: release.master_id,
@@ -42,27 +36,43 @@ class Importer
       return album
     end
 
-    artist = select_artist_info(release.artists)
-
-    album = Album.create(
+    album = Album.find_or_initialize_by(discogs_release_id: release.id)
+    album.assign_attributes(
       label: label_info.name,
-      catnum: catnum,
-      year: release.year,
-      artist: artist,
+      artist: select_artist_info(release.artists),
       title: release.title.to_lat,
-      discogs_release_id: release.id,
       discogs_master_id: release.master_id,
       discogs_catnum: label_info.catno,
       info_url: release.uri,
       image_url: select_image_url(release.images),
       tracks: select_tracks(release.tracklist)
     )
-    print "  New album.\n".green
-    check_for_duplicate(album)
+
+    album.catnum ||= catnum # Don't overwrite catnum
+    album.year = release.year.to_i if release.year.to_i > 0
+
+    if album.new_record?
+      album.save
+      print "New album [#{album.id}].\n".green
+    else
+      changes = album.changes.map{|k, v| "#{k}: #{v[0]} > #{v[1]}"}
+      album.save
+      print "Updated [#{album.id}] #{changes.join(', ')}\n".yellow
+    end
+
     album
   end
 
   private
+
+    def latest_version_imported?(release)
+    # Skip re-import of non-yu albums
+    return true if Album.where(discogs_release_id: release.id, in_yu: false).exists?
+    # Skip full release import if year or url (artist + title) haven't changed
+    version = Album.where(discogs_release_id: release.id).where("info_url LIKE ?", "%#{release.uri}%")
+    version = version.where(year: release.year) if release.year.to_i > 0
+    version.exists?
+  end
 
   def select_label_info(labels)
     known_labels = labels.select do |l|
@@ -87,27 +97,6 @@ class Importer
 
   def select_tracks(tracklist)
     tracklist.count{|t| t.type_ == "track" && t.title.present? }
-  end
-
-  def check_for_duplicate(album)
-    original = find_original(album)
-    return if original.nil?
-
-    # If original doesn't have a master_id, try re-fetching it
-    if original.discogs_master_id.blank?
-      original_release = DiscogsYu.find_by_id(album.discogs_release_id)
-      original.update_attributes(discogs_master_id: original_release.master_id) if original_release.try(:master_id)
-    end
-
-    album.update_attributes(duplicate_of_id: original.id)
-    print "  Duplicate detected.\n".yellow
-  end
-
-  def find_original(album)
-    # Try finding the original either by master_id or by label+catnum+title
-    # This might not catch every original, but it will not catch false ones
-    original = Album.original.where("id != ?", album.id).where(discogs_master_id: album.discogs_master_id).first if album.discogs_master_id
-    original ||= Album.original.where("id != ?", album.id).where("catnum != 'NONE'").where(label: album.label, catnum: album.catnum, artist: album.artist).first
   end
 
 end

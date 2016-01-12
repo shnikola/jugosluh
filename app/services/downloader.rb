@@ -7,12 +7,15 @@ class Downloader
 
   def start(from_id = nil)
     Source.to_download.where("id >= ?", from_id || 0).find_each do |source|
+      print "S: #{source.title} (#{source.id})\n"
+      print "A: #{source.album} #{source.album.year} (#{source.album_id})\n"
+
       if Source.downloaded.where(album_id: source.album_id).exists?
+        print "Already downloaded.\n".light_blue
         source.downloaded!
         next
       end
 
-      print "Downloading #{source.id} [#{source.album}]\n"
       file_name = get_file(source.download_url)
 
       if file_name

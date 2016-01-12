@@ -1,9 +1,9 @@
 module Catnum
-  
+
   def self.guess(line)
     return if line.blank?
     line = line.gsub("\u200E", "")
-   
+
     if line =~ /Jugoton/i
       catnum = line.match(/Jugoton[\s–,-]+(?:Zagreb[\s–,-]+)?(?:LP )?(\w+[\s–-]*(?:S )?(?:-?\w)+)/i).try(:[],1)
     elsif line =~ /Beograd Disk/i
@@ -20,15 +20,17 @@ module Catnum
       catnum = line.match(/Suzy(?:[\s,–-]+Zagreb)?(?:[\s,–-]+records)?[\s,–-]+(\w+[\s–-]*\w?[\s–-]*\d+)/i).try(:[], 1)
     elsif line =~ /RTB/i
       catnum = line.match(/(?:PGP[ -])?(?:RTB|S)(?:[\s–-]+PGP)?(?:[\s,–-]+Beograd)?[\s–,-]*(\w*(?:[\s–-]+I+)?(?:[\s–-]+[\d]+)+)/i).try(:[], 1)
+    elsif line =~ /Krusevac/i
+      catnum = line.match(/Krusevac[\s,–-]+(\w+[\s–-]*\d+)/i).try(:[], 1)
     end
-    
+
     normalize(catnum) if catnum.present?
   end
-  
+
   def self.normalize(catnum)
     catnum.strip.gsub(/[\s-]+/, "-").to_lat.upcase
   end
-  
+
   def self.next(catnum)
     number = catnum.scan(/\d+/).last
     return nil if number.nil?
