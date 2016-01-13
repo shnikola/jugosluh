@@ -4,7 +4,7 @@
     %p Želim slušati:
     - Label.major.each do |label_name|
       = label_tag label_name do
-        = check_box_tag label_name, "1", session[:whitelist_labels].include?(label_name)
+        = check_box_tag label_name, "1", session[:whitelist_labels].present? && session[:whitelist_labels].include?(label_name)
         = label_name
     %p (Ostavi prazno ako se ne želiš ograničavati)
     = submit_tag "Zapamti", class: 'pure-button pure-button-primary'
