@@ -10,10 +10,10 @@ module DiscogsYu
         break if response.pagination.page >= response.pagination.pages
         options.merge!(page: response.pagination.page + 1)
       rescue EOFError => e
-        p "EOF Error, retrying..."
+        print "EOF Error, retrying...\n".black.on_red
         retry
       rescue Errno::ECONNRESET => e
-        p "Errno::ECONNRESET, retrying..."
+        print "Errno::ECONNRESET, retrying...\n".black.on_red
         retry
       end
     end
@@ -24,10 +24,10 @@ module DiscogsYu
     sleep(0.5) # TODO: make this smarter
     discogs.get_release(id)
   rescue Discogs::UnknownResource => e
-    p "Couldn't find: #{id}"
+    print "Couldn't find: #{id}\n".black.on_red
     return nil
   rescue EOFError, OpenSSL::SSL::SSLError, Errno::ECONNRESET => e
-    p "#{e}, retrying..."
+    print "#{e}, retrying...\n".black.on_red
     retry
   end
 
@@ -37,7 +37,7 @@ module DiscogsYu
     begin
       response = discogs.search(name, options)
     rescue EOFError, OpenSSL::SSL::SSLError, Errno::ECONNRESET => e
-      p "#{e}, retrying..."
+      print "#{e}, retrying...\n".black.on_red
       retry
     end
     response.results

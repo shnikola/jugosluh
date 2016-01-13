@@ -84,9 +84,6 @@ class Cleaner
   end
 
 
-
-  # ==== Listing:
-
   def find_missing_years
     # Search discogs updates
     Album.original.maybe_in_yu.where(year: nil).find_each do |album|
@@ -110,26 +107,25 @@ class Cleaner
     end
   end
 
-  def list_duplicate_catnums
-    album_map = Hash.new([])
-    Album.original.maybe_in_yu.where("catnum != ?", 'NONE').find_each do |album|
-      album_map[album.label + "#" + album.catnum] += [album]
-    end
-
-    album_map.select!{|_, v| v.count > 1}
-    album_map.values.each do |albums|
-      albums.each { |a| print "[#{a.label} #{a.catnum}] #{a.artist} - #{a.title}\n"}
-    end
-  end
-
   # ==== After download:
 
   def reconnect_mismatched_sources
     downloader = Downloader.new
     Source.download_mismatched.find_each do |source|
-      album = source.possible_albums.reject{|a| a.id == source.album_id}.first
-      next if album.nil?
-      p "New connection: #{source.title} :: #{album}"
+      albums = possible_matches(source).reject{|a| a.id == source.album_id}
+      next if albums.empty?
+
+      print "#{source.title} [#{source.id}]\n"
+      print "Multiple: #{albums.map(&:to_s).join(', ')}\n".light_blue if albums.count > 1
+
+      album = albums.first
+      if source.catnum? && source.catnum == album.catnum
+        print "#{album} (#{album.year}) [#{album.id}]\n".green
+      else
+        # next
+        print "#{album} (#{album.year}) [#{album.id}]\n".yellow
+      end
+
       current_folder = "#{Rails.root}/tmp/downloads/#{downloader.folder_name(source)}"
       source.update_attributes(album_id: album.id)
       downloader.check_downloaded(source, current_folder)

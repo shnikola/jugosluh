@@ -20,16 +20,15 @@ class Importer
   end
 
   def save_to_db(release)
-    label_info = select_label_info(release.labels)
-    catnum = Catnum.normalize(label_info.catno)
+    label, catnum = select_label_info(release.labels)
 
     # Check by label+catnum if we have the same non-discogs album already in db
-    if album = Album.non_discogs.find_by(label: label_info.name, catnum: catnum)
+    if album = Album.non_discogs.find_by(label: label, catnum: catnum)
       print "Connected to manually entered #{album} (#{album.id}).\n".light_blue
       album.update_attributes(
         discogs_release_id: release.id,
         discogs_master_id: release.master_id,
-        discogs_catnum: label_info.catno,
+        discogs_catnum: catnum,
         info_url: release.uri,
         image_url: select_image_url(release.images)
       )
@@ -38,11 +37,11 @@ class Importer
 
     album = Album.find_or_initialize_by(discogs_release_id: release.id)
     album.assign_attributes(
-      label: label_info.name,
+      label: label,
       artist: select_artist_info(release.artists),
       title: release.title.to_lat,
       discogs_master_id: release.master_id,
-      discogs_catnum: label_info.catno,
+      discogs_catnum: catnum,
       info_url: release.uri,
       image_url: select_image_url(release.images),
       tracks: select_tracks(release.tracklist)
@@ -75,13 +74,9 @@ class Importer
   end
 
   def select_label_info(labels)
-    known_labels = labels.select do |l|
-      ["Jugoton", "PGP RTB", "Diskos", "Beograd Disk", "Diskoton", "Suzy",
-       "Jugodisk", "RTV Ljubljana", "Helidon", "ZKP RTVL", "Studio B",
-       "Sarajevo Disk"].include?(l.name)
-    end
-
-    known_labels.first || labels.first
+    # In case of multiple, prefer known label
+    label = labels.find{|l| Label.major?(l.name)} || labels.first
+    return Label.normalize(label.name), Catnum.normalize(label.catno)
   end
 
   def select_artist_info(artists)
