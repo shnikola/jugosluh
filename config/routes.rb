@@ -13,4 +13,6 @@ Rails.application.routes.draw do
   resources :user_lists, only: [:index, :show, :create, :destroy]
   resources :user_list_albums, only: [:new, :create, :destroy]
   resources :album_issues, only: [:index, :new, :create]
+  
+  resource :settings, only: [:show, :update]
 end
