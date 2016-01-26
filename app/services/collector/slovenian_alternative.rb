@@ -1,24 +1,31 @@
 require "open-uri"
 
 class Collector
-  module Jugorockforever
+  module SlovenianAlternative
 
-    def jugorockforever_crawl
-      page = Nokogiri::HTML(open("http://jugorockforever.blogspot.com"))
+    def slovenian_alternative_crawl
+      page = Nokogiri::HTML(open("http://slovenian-alternative-musiq.blogspot.hr"))
       loop do
-        page.css(".post").each { |p| jugorockforever_crawl_post(p) }
+        page.css(".post").each { |p| slovenian_alternative_crawl_post(p) }
         next_page_link = page.css("a.blog-pager-older-link").first
         break if next_page_link.blank?
         page = Nokogiri::HTML(open(next_page_link["href"]))
       end
     end
 
-    def jugorockforever_crawl_post(post)
+    def slovenian_alternative_crawl_post(post)
       title = post.css(".post-title").text.strip
-      artist = title.split("-").first.strip.downcase.capitalize
-      details = post.css(".post-body").text.gsub(/download/i, "").strip.squish
+      artist = title.split(":").first.strip.downcase.capitalize
 
-      print "Searching #{title} " if @trace
+      print "#{title}" if @trace
+      year = title.match(/\((\d{4})\)/).try(:[], 1).try(:to_i)
+
+      if year && year > 1992
+        print "...Not in YU.\n"  if @trace
+        return
+      end
+
+      details = post.css(".post-body").text.strip.squish
 
       download_url = nil
       Downloader::Domains::SHARE_SITE_DOMAINS.keys.each do |domain|
@@ -42,19 +49,17 @@ class Collector
         artist: artist,
         details: details,
         download_url: download_url,
-        origin_site: 'jugorockforever.blogspot.com'
+        origin_site: 'slovenian-alternative-musiq.blogspot.hr'
       )
 
       if @trace
         print "...Success.\n".green
       else
-        print "Found: #{artist} : #{title}\n".green
+        print "Found: #{title}\n".green
       end
 
-      if title =~ /\b(19\d\d)-(19)?\d\d\b/ || title =~ /\bdemo\b/i
-        source.compilation!
-      elsif title =~/\b(19\d\d)\b/
-        source.confirmed!
+      if year && year < 1992
+       source.confirmed!
       end
 
       add_to_collected(source)

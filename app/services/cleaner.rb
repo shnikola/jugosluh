@@ -91,7 +91,7 @@ class Cleaner
       release = DiscogsYu.find_by_id(album.discogs_release_id)
       if release.year.to_i > 0
         album.update(year: release.year)
-        print "#{album} [#{album.year}] (#{album.id})\n\n".green
+        print "#{album} [#{album.year}] (#{album.id})\n".green
       end
     end
 
@@ -108,6 +108,24 @@ class Cleaner
   end
 
   # ==== After download:
+
+  # WARNING: this one produced a lot of manual work, try to make it smarter
+  # it found a lot of undetected duplicates though
+  def recheck_downloaded_sources(source_ids = [])
+    sources = source_ids ? Source.where(id: source_ids) : Source.all
+
+    sources.downloaded.joins(:album).where("sources.catnum IS NOT NULL AND sources.catnum != albums.catnum").each do |source|
+      new_album = possible_matches(source).first
+      if new_album.nil?
+        # Ignore for now, although these should be recheked too
+      elsif new_album != source.album
+        print "#{source.title} [#{source.id}] [#{source.catnum}]\n".yellow
+        print "#{source.album} (#{source.album.year}) [#{source.album.id}] [#{source.album.catnum}]\n".yellow
+        print "#{new_album} (#{new_album.year}) [#{new_album.id}] [#{new_album.catnum}]\n\n".green
+        #source.update(status: 1, album_id: new_album.id)
+      end
+    end
+  end
 
   def reconnect_mismatched_sources
     downloader = Downloader.new
@@ -235,6 +253,8 @@ class Cleaner
       true
     when /Suzy/i
       catnum =~ /(^KS)|(^LP-)|(^SP-)/
+    when /RTV Ljubljana/i
+      catnum =~ /(^KD-)|(^LD-)|(^SD-)/
     when /Jugodisk/i
       catnum =~ /(^BDN-)|(^JDN-)|(^LPD-0)/
     end

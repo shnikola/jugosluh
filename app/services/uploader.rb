@@ -1,6 +1,6 @@
 class Uploader
 
-  CURRENT_DRIVE_ID = 17
+  CURRENT_DRIVE_ID = 18
 
   def start(*ids)
     ids = Source.downloaded.pluck(:album_id) if ids.empty?

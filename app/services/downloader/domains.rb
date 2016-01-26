@@ -5,19 +5,49 @@ require "watir-webdriver/wait"
 class Downloader
   module Domains
 
+    SHARE_SITE_DOMAINS = {
+      "drive.google.com" => :google_drive,
+      "file-upload.net" => :file_upload,
+      "mega.co.nz" => :mega_nz,
+      "mega.nz" => :mega_nz,
+      "mediafire.com" => :mediafire,
+      "onedrive.live.com" => :one_drive,
+      "skydrive.live.com" => :one_drive,
+      "sdrv.ms" => :one_drive,
+      "sendspace.com" => :sendspace,
+      "solidfiles.com" => :solidfiles,
+      "yadi.sk" => :yadi,
+      "zippyshare.com" => :zippyshare
+    }
+
     def get_file(url)
-      case url
-        when /mega(\.co)?\.nz/ then get_mega_nz(url)
-        when /mediafire\.com/ then get_mediafire_com(url)
-        when /senspace\.com/ then get_sendspace_com(url)
-        when /divshare\.com/ then get_divshare_com(url)
-        when /solidfiles\.com/ then get_solidfiles_com(url)
-        when /zippyshare\.com/ then get_zippyshare_com(url)
-        when /file-upload\.net/ then get_fileupload_net(url)
+      SHARE_SITE_DOMAINS.each do |domain, name|
+        return __send__(:"get_#{name}", url) if url.include?(domain)
       end
     end
 
-    def get_mediafire_com(url)
+    def get_file_upload(url)
+      watir_download do
+        browser.goto url
+        browser.element(title: 'download').when_present.click
+      end
+    end
+
+    def get_google_drive(url)
+      watir_download do
+        browser.goto url
+        browser.element(class: 'drive-viewer-download-icon').when_present.click
+        sleep 5
+        if !browser.windows.last.current?
+          browser.windows.last.use
+          browser.element(id: 'uc-download-link').click
+          sleep 5
+          browser.windows.last.close
+        end
+      end
+    end
+
+    def get_mediafire(url)
       watir_download(900) do
         browser.goto url
         sleep 5
@@ -31,22 +61,33 @@ class Downloader
       end
     end
 
-    def get_zippyshare_com(url)
-      watir_download do
+    def get_mega_nz(url)
+      watir_download(30) do
+        browser.cookies.clear
         browser.goto url
-        sleep 5 # Wait for href to be set up
-        browser.element(id: 'dlbutton').when_present.click
+        sleep 3
+        browser.execute_script("window.onbeforeunload = null;") # Disable prompts
+        sleep 2
+
+        return nil if browser.div(class: 'download some-reason').present?
+
+        browser.div(class: 'throught-browser').when_present.click
+
+        browser.div(class: 'status-txt green').wait_until_present(600)
       end
     end
 
-    def get_solidfiles_com(url)
+    def get_one_drive(url)
       watir_download do
+        browser.cookies.clear
         browser.goto url
-        browser.element(id: 'ddl-text').when_present.click
+        browser.div(class: 'CommandBar').wait_until_present
+        sleep 2
+        browser.divs(class: 'CommandBarItem-link').last.click
       end
     end
 
-    def get_sendspace_com(url)
+    def get_sendspace(url)
       url.gsub("http://", "https://")
       noko = Nokogiri::HTML(open(url))
       button = noko.css("#download_button").first
@@ -54,42 +95,28 @@ class Downloader
       direct_download(button["href"]) if button
     end
 
-    def get_divshare_com(url)
-      noko = Nokogiri::HTML(open(url))
-      s = noko.css("#fileInfoTextStat script").first.to_s
-      download_url = s.match(%r['(http://[\w]+.divshare[^']*)'])[1]
-      file_name = noko.css(".fileNameHeader").text.strip
-
-      direct_download(download_url, file_name) if download_url.present?
-    end
-
-    def get_fileupload_net(url)
+    def get_solidfiles(url)
       watir_download do
         browser.goto url
-        browser.element(title: 'download').when_present.click
+        sleep 5
+        # Remove overlay
+        browser.execute_script("document.getElementsByClassName('ui-dialog')[0].nextElementSibling.remove()")
+        browser.element(id: 'ddl-text').when_present.click
       end
     end
 
-    def get_mega_nz(url)
-      watir_download(30) do
-        browser.cookies.clear
+    def get_yadi(url)
+      watir_download do
         browser.goto url
-        sleep 3
-        browser.execute_script("window.onbeforeunload = null;") # Disable prompts
-        browser.execute_script("window.localStorage.clear();")
-        sleep 2
+        browser.element(class: 'js-download-button').when_present.click
+      end
+    end
 
-        return nil if browser.div(class: 'not-available-some-reason').present?
-
-        browser.div(class: 'new-download-red-button').when_present.click
-
-        # Check if error message appears
-        3.times do
-          sleep 10
-          return nil if browser.div(class: 'temporary-error').present?
-        end
-
-        browser.div(class: 'download-complete-icon').wait_until_present(600)
+    def get_zippyshare(url)
+      watir_download do
+        browser.goto url
+        sleep 5 # Wait for href to be set up
+        browser.element(id: 'dlbutton').when_present.click
       end
     end
 
@@ -141,7 +168,7 @@ class Downloader
 
       # Use uBlock Origin
       switches = [
-        '--load-extension=/Users/nikola/Library/Application Support/Google/Chrome/Default/Extensions/cjpalhdlnbpafiamejdnhcphjbkeiagm/1.5.3_0'
+        '--load-extension=/Users/nikola/Library/Application Support/Google/Chrome/Default/Extensions/cjpalhdlnbpafiamejdnhcphjbkeiagm/1.5.6_0'
       ]
 
       {desired_capabilities: caps, switches: switches}

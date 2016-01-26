@@ -32,6 +32,7 @@ gem 'kaminari'
 gem 'cyrillizer'
 
 gem 'activerecord-import'
+gem 'open_uri_redirections'
 
 gem 'watir-webdriver'
 

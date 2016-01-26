@@ -7,11 +7,12 @@ class Downloader
 
   def start(from_id = nil)
     Source.to_download.where("id >= ?", from_id || 0).find_each do |source|
+      print "Downloading #{source.download_url}\n"
       print "S: #{source.title} (#{source.id})\n"
       print "A: #{source.album} #{source.album.year} (#{source.album_id})\n"
 
-      if Source.downloaded.where(album_id: source.album_id).exists?
-        print "Already downloaded.\n".light_blue
+      if existing_source = Source.downloaded.where(album_id: source.album_id).first
+        print "Already downloaded as #{existing_source.title} (#{existing_source.id})\n".light_blue
         source.downloaded!
         next
       end
@@ -35,11 +36,11 @@ class Downloader
     FileUtils.mv("#{download_path}/#{file}", "#{folder}/#{file}")
 
     escaped_file = file.shellescape
+    password = archive_password(source.origin_site)
     if file.end_with? 'rar'
-      password = "" # "-pyugojazz"
-      `unrar x #{password} #{folder}/#{escaped_file} #{folder} && rm #{folder}/#{escaped_file}`
+      `unrar x #{('-p' + password) if password} #{folder}/#{escaped_file} #{folder} && rm #{folder}/#{escaped_file}`
     elsif file.end_with? 'zip'
-      `unzip #{folder}/#{escaped_file} -d #{folder} && rm #{folder}/#{escaped_file}`
+      `unzip #{('-P ' + password) if password} #{folder}/#{escaped_file} -d #{folder} && rm #{folder}/#{escaped_file}`
     end
 
     # If we extracted a folder, move the files out of it
@@ -85,6 +86,13 @@ class Downloader
 
   def download_path
     "#{Rails.root}/tmp/downloads"
+  end
+
+  def archive_password(site)
+    {
+      "yukebox.blogspot.hr" => "yukebox.blogspot.com",
+      "yugojazz.blogspot.com" => "yugojazz"
+    }[site]
   end
 
 end

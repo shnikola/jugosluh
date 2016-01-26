@@ -9,7 +9,7 @@ development:
   database: jugosluh
   username: root
   password:
-  host: localhost
+  host: 127.0.0.1
   reconnect: true
 
 # Warning: The database defined as "test" will be erased and
