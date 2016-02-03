@@ -1,10 +1,12 @@
 class Collector
-  include Collector::Smboemi
-  include Collector::Jugorockforever
-  include Collector::MuzikaBalkana
-  include Collector::SlovenianAlternative
-  include Collector::Samosviraj
-  include Collector::Yukebox
+  @@crawlers = [
+    Collector::Smboemi,
+    Collector::Jugorockforever,
+    Collector::MuzikaBalkana,
+    Collector::SlovenianAlternative,
+    Collector::Samosviraj,
+    Collector::Yukebox
+  ]
 
   def initialize(**options)
     @trace = options[:trace]
@@ -12,12 +14,10 @@ class Collector
   end
 
   def start
-    #smboemi_crawl
-    #jugorockforever_crawl
-    # muzika_balkana_crawl
-    #samosviraj_crawl
-    #slovenian_alternative_crawl
-    yukebox_crawl
+    @@crawlers.each do |c|
+      print "Collecting from #{c.name.demodulize.humanize}\n\n".on_blue
+      c.new.crawl(trace: @trace, after: lambda { |s| add_to_collected(s) })
+    end
     Cleaner.new.after_collecting(@collected.map(&:id))
   end
 

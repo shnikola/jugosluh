@@ -38,12 +38,13 @@ class Cleaner
     print "\nDetecting duplicates...\n".on_blue
     albums = album_ids ? Album.where(id: album_ids) : Album.all
 
-    albums.find_each do |album|
-      next if album.discogs_master_id.blank? || album.download_url?
-      original = Album.original.where("id != ?", album.id).order("id").find_by(discogs_master_id: album.discogs_master_id)
+    albums.original.order("id DESC").each do |album|
+      original = find_original(album)
       next if original.nil?
       album.update_attributes(duplicate_of_id: original.id)
       print "Duplicate #{album} (#{album.id}) of #{original} (#{original.id})\n".green
+      print "Already uploaded!\n".red if album.download_url?
+
       if better_info?(album, original)
         print "Better info in duplicate, switching.\n".blue
         duplicate_attrs, original_attrs = album.info_attributes, original.info_attributes
@@ -260,9 +261,26 @@ class Cleaner
     end
   end
 
+  def find_original(album)
+    return if album.discogs_master_id.blank?
+    original = Album.original.where("id != ?", album.id).order("id").find_by(discogs_master_id: album.discogs_master_id)
+    return original if original
+    version_ids = DiscogsYu.find_release_version_ids(album.discogs_master_id)
+    Album.where(discogs_release_id: version_ids).update_all(discogs_master_id: album.discogs_master_id)
+    original = Album.original.where("id != ?", album.id).order("id").find_by(discogs_master_id: album.discogs_master_id)
+    return original
+  end
+
   def better_info?(duplicate, original)
-    # If the duplicate was out earlier than the original
-    (duplicate.year? && (original.year.nil? || duplicate.year < original.year)) ||
-    (duplicate.year == original.year && duplicate.catnum.start_with?('L') && !original.catnum.start_with?('L'))
+    if duplicate.label != original.label
+      return true if Label.major?(duplicate.label) && !Label.major?(original.label)
+      return false if !Label.major?(duplicate.label) && Label.major?(original.label)
+    end
+
+    if duplicate.year?
+      return true if original.year.nil? || duplicate.year < original.year
+    end
+
+    return false
   end
 end

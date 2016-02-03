@@ -9,6 +9,7 @@ class Lister
     album_map.select!{|_, v| v.count > 1}
     album_map.values.each do |albums|
       albums.each { |a| print "[#{a.label} #{a.catnum}] #{a.artist} - #{a.title}\n"}
+      print "\n"
     end
   end
 
@@ -39,7 +40,7 @@ class Lister
           print "#{prefix}-#{catnum}  ".green
           next if i + 1 >= catnums.count
           diff = catnums[i + 1] - catnum - 1
-          if diff < 20
+          if diff < 19
             prefix_estimated_total += diff
             diff.times { |d| print "#{prefix}-#{catnum + d + 1}  ".yellow }
           else

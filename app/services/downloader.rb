@@ -61,7 +61,7 @@ class Downloader
   end
 
   def check_downloaded(source, folder)
-    if Dir.glob("#{folder}/*.{mp3,flac}", File::FNM_CASEFOLD).count != source.album.tracks
+    if Dir.glob("#{folder}/*.mp3", File::FNM_CASEFOLD).count != source.album.tracks
       source.download_mismatched!
     else
       source.downloaded!

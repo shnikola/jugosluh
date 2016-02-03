@@ -34,7 +34,7 @@ module Catnum
   end
 
   def self.normalize(catnum)
-    catnum.strip.gsub(/[\s-]+/, "-").to_lat.upcase
+    catnum.strip.gsub(/[\s–-]+/, "-").to_lat.upcase
   end
 
 end

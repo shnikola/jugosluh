@@ -23,19 +23,10 @@ class Importer
     label, catnum = select_label_info(release.labels)
 
     # Check by label+catnum if we have the same non-discogs album already in db
-    if album = Album.non_discogs.find_by(label: label, catnum: catnum)
-      print "Connected to manually entered #{album} (#{album.id}).\n".light_blue
-      album.update_attributes(
-        discogs_release_id: release.id,
-        discogs_master_id: release.master_id,
-        discogs_catnum: catnum,
-        info_url: release.uri,
-        image_url: select_image_url(release.images)
-      )
-      return album
-    end
+    album = Album.non_discogs.find_by(label: label, catnum: catnum)
+    print "Connected to manually entered...".light_blue if album
 
-    album = Album.find_or_initialize_by(discogs_release_id: release.id)
+    album ||= Album.find_or_initialize_by(discogs_release_id: release.id)
     album.assign_attributes(
       label: label,
       artist: select_artist_info(release.artists),

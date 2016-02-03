@@ -1,40 +1,29 @@
-require "open-uri"
-
 class Collector
-  module Yukebox
+  class Yukebox < Blogspot
 
-    def yukebox_crawl
-      page = Nokogiri::HTML(open("http://yukebox.blogspot.hr/"))
-      loop do
-        page.css(".post").each { |p| yukebox_crawl_post(p) }
-        next_page_link = page.css("a.blog-pager-older-link").first
-        break if next_page_link.blank?
-        page = Nokogiri::HTML(open(next_page_link["href"]))
+    def crawl(options = {})
+      @options = options
+      find_posts("http://yukebox.blogspot.hr") do |post|
+        crawl_post(post)
       end
     end
 
-    def yukebox_crawl_post(post)
+    def crawl_post(post)
       title = post.css(".post-title").text.strip
       artist = title.split("-").first
 
-      print "#{title}" if @trace
+      print "#{title}" if @options[:trace]
 
       details = post.css(".post-body").text.strip.squish
 
-      download_url = nil
-      Downloader::Domains::SHARE_SITE_DOMAINS.keys.each do |domain|
-        link = post.css("a[href*=\"#{domain}\"]").first
-        if link
-          download_url = link['href'].strip
-          break
-        end
-      end
+      download_link = find_download_links(post).first
+      download_url = download_link['href'].strip if download_link
 
       if download_url.blank?
-        print "...No link found.\n".red if @trace
+        print "...No link found.\n".red if @options[:trace]
         return
       elsif Source.where(download_url: download_url).exists?
-        print "...Already collected.\n" if @trace
+        print "...Already collected.\n" if @options[:trace]
         return
       end
 
@@ -51,13 +40,13 @@ class Collector
         origin_site: 'yukebox.blogspot.hr'
       )
 
-      if @trace
+      if @options[:trace]
         print "...Success (#{catnum}).\n".green
       else
         print "Found: #{title}\n".green
       end
 
-      add_to_collected(source)
+      @options[:after].call(source) if @options[:after]
     end
 
   end

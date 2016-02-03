@@ -5,19 +5,21 @@ require "watir-webdriver/wait"
 class Downloader
   module Domains
 
+    # Sorted by preference
+
     SHARE_SITE_DOMAINS = {
-      "drive.google.com" => :google_drive,
-      "file-upload.net" => :file_upload,
       "mega.co.nz" => :mega_nz,
       "mega.nz" => :mega_nz,
-      "mediafire.com" => :mediafire,
       "onedrive.live.com" => :one_drive,
       "skydrive.live.com" => :one_drive,
       "sdrv.ms" => :one_drive,
+      "drive.google.com" => :google_drive,
+      "file-upload.net" => :file_upload,
       "sendspace.com" => :sendspace,
       "solidfiles.com" => :solidfiles,
       "yadi.sk" => :yadi,
-      "zippyshare.com" => :zippyshare
+      "zippyshare.com" => :zippyshare,
+      "mediafire.com" => :mediafire,
     }
 
     def get_file(url)
@@ -62,7 +64,7 @@ class Downloader
     end
 
     def get_mega_nz(url)
-      watir_download(30) do
+      watir_download do
         browser.cookies.clear
         browser.goto url
         sleep 3
@@ -72,8 +74,6 @@ class Downloader
         return nil if browser.div(class: 'download some-reason').present?
 
         browser.div(class: 'throught-browser').when_present.click
-
-        browser.div(class: 'status-txt green').wait_until_present(600)
       end
     end
 
