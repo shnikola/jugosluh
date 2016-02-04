@@ -15,7 +15,7 @@ class Cleaner
 
     # All after 1991 is not yu
     resolved = albums.unresolved.where("year > 1991").update_all(in_yu: false)
-    print "Detected #{resolved} articles after 1991.\n".red
+    print "Detected #{resolved} articles after 1991.\n".red if resolved > 0
 
     # Assign originals first
     albums.unresolved.original.where("year IS NOT NULL").find_each do |album|

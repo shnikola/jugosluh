@@ -55,7 +55,7 @@ class Importer
 
   private
 
-    def latest_version_imported?(release)
+  def latest_version_imported?(release)
     # Skip re-import of non-yu albums
     return true if Album.where(discogs_release_id: release.id, in_yu: false).exists?
     # Skip full release import if year or url (artist + title) haven't changed
@@ -82,7 +82,9 @@ class Importer
   end
 
   def select_tracks(tracklist)
-    tracklist.count{|t| t.type_ == "track" && t.title.present? }
+    tracks = tracklist.select{ |t| t.type_ == "track" && t.title.present? }
+    tracks = tracklist.flat_map{ |t| t.sub_tracks.select{ |s| s.type_ == "track" && s.title.present? } } if tracks.count == 0
+    tracks.count
   end
 
 end

@@ -3,6 +3,7 @@ class Collector
     Collector::Smboemi,
     Collector::Jugorockforever,
     Collector::MuzikaBalkana,
+    Collector::Nostalgicno,
     Collector::SlovenianAlternative,
     Collector::Samosviraj,
     Collector::Yukebox
