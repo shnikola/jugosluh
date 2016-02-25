@@ -52,7 +52,7 @@ class Downloader
     def get_mediafire(url)
       watir_download(900) do
         browser.goto url
-        sleep 5
+        sleep 10
         if browser.element(id: 'recaptcha_widget_div').present?
           browser.element(id: 'recaptcha-anchor-label').when_present.click
           sleep 5
@@ -168,7 +168,7 @@ class Downloader
 
       # Use uBlock Origin
       switches = [
-        '--load-extension=/Users/nikola/Library/Application Support/Google/Chrome/Default/Extensions/cjpalhdlnbpafiamejdnhcphjbkeiagm/1.5.6_0'
+        '--load-extension=/Users/nikola/Library/Application Support/Google/Chrome/Default/Extensions/cjpalhdlnbpafiamejdnhcphjbkeiagm/1.6.0_0'
       ]
 
       {desired_capabilities: caps, switches: switches}

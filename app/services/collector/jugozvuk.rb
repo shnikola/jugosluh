@@ -1,26 +1,29 @@
 class Collector
-  class SlovenianAlternative < Blogspot
+  class Jugozvuk < Blogspot
 
     def crawl(options = {})
       @options = options
-      find_posts("http://slovenian-alternative-musiq.blogspot.hr") do |post|
+      find_posts("http://jugozvuk.blogspot.com/") do |post|
         crawl_post(post)
       end
     end
 
     def crawl_post(post)
-      title = post.css(".post-title").text.strip
-      artist = title.split(":").first.strip.downcase.capitalize
+      title = post.css(".post-title").text.to_lat.strip
+      artist = title.split("-").first if title.include?("-")
+      artist ||= title.match(/((?:[A-ZČŠĆĐŽ]{2,}\s*)+)/).try(:[], 1)
+      artist = artist.strip.capitalize if artist
 
       print "#{title}" if @options[:trace]
-      year = title.match(/\((\d{4})\)/).try(:[], 1).try(:to_i)
+      year = title.match(/(\d{4})/).try(:[], 1).try(:to_i)
+      details = post.css(".post-body").text.to_lat.strip.squish
 
       if year && year >= 1992
         print "...Not in YU.\n" if @options[:trace]
         return
+      elsif title =~ /radio emisija/i || details =~ /radio emisija/i
+        print "...Radio emisija.\n" if @options[:trace]
       end
-
-      details = post.css(".post-body").text.strip.squish
 
       download_link = find_download_links(post).first
       download_url = download_link['href'].strip if download_link
@@ -38,17 +41,14 @@ class Collector
         artist: artist,
         details: details,
         download_url: download_url,
-        origin_site: 'slovenian-alternative-musiq.blogspot.hr'
+        status: :confirmed,
+        origin_site: 'jugozvuk.blogspot.com'
       )
 
       if @options[:trace]
         print "...Success.\n".green
       else
         print "Found: #{title}\n".green
-      end
-
-      if year
-        source.confirmed!
       end
 
       @options[:after].call(source) if @options[:after]

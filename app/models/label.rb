@@ -9,7 +9,7 @@ class Label
   end
 
   def self.normalize(label)
-    {'zkp rtvl' => "RTV Ljubljana"}[label.downcase] || label
+    {'zkp rtvl' => "RTV Ljubljana", 'rtb' => "PGP RTB"}[label.downcase] || label
   end
 
   CATNUM_PREFIXES = {

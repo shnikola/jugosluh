@@ -15,7 +15,7 @@ class Collector
       print "#{title}" if @options[:trace]
       year = title.match(/\((\d{4})\)/).try(:[], 1).try(:to_i)
 
-      if year && year > 1992
+      if year && year >= 1992
         print "...Not in YU.\n" if @options[:trace]
         return
       end
@@ -47,7 +47,7 @@ class Collector
         print "Found: #{title}\n".green
       end
 
-      if year && year < 1992
+      if year
         source.confirmed!
       end
 

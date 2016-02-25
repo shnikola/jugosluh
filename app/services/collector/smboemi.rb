@@ -64,7 +64,7 @@ class Collector
 
         year = title.match(/\b((?:19|20)\d\d)\b/).try(:[], 1).to_i
 
-        if year > 1992
+        if year >= 1992
           print "...Not in YU.\n" if @options[:trace]
           next
         end

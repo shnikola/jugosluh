@@ -38,6 +38,10 @@ class Album < ActiveRecord::Base
     duplicate_of_id ? Album.find(duplicate_of_id) : self
   end
 
+  def maybe_in_yu?
+    in_yu? || in_yu.nil?
+  end
+
   def uploaded?
     download_url.present?
   end

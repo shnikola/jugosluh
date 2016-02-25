@@ -6,28 +6,39 @@ class Downloader
   include Downloader::Domains
 
   def start(from_id = nil)
+    downloaded = []
+
     Source.to_download.where("id >= ?", from_id || 0).find_each do |source|
-      print "Downloading #{source.download_url}\n"
-      print "S: #{source.title} (#{source.id})\n"
-      print "A: #{source.album} #{source.album.year} (#{source.album_id})\n"
-
-      if existing_source = Source.downloaded.where(album_id: source.album_id).first
-        print "Already downloaded as #{existing_source.title} (#{existing_source.id})\n".light_blue
-        source.downloaded!
-        next
-      end
-
-      file_name = get_file(source.download_url)
-
-      if file_name
-        folder = extract_file(source, file_name)
-        check_downloaded(source, folder)
-        print "#{source.status.humanize} [#{file_name}]\n".send(source.downloaded? ? :green : :yellow)
-      else
-        source.download_failed!
-        print "Failed :(\n".red
-      end
+      download_source(source)
+      downloaded << source.album if source.downloaded?
     end
+
+    Cleaner.new.after_download(downloaded.map(&:id))
+  end
+
+  def download_source(source)
+    print "Downloading #{source.download_url}\n"
+    print "S: #{source.title} (#{source.id})\n"
+    print "A: #{source.album} #{source.album.year} (#{source.album_id})\n"
+
+    if existing_source = Source.downloaded.where(album_id: source.album_id).first
+      print "Already downloaded as #{existing_source.title} (#{existing_source.id})\n".light_blue
+      source.downloaded!
+      return source
+    end
+
+    file_name = get_file(source.download_url)
+
+    if file_name
+      folder = extract_file(source, file_name)
+      check_downloaded(source, folder)
+      print "#{source.status.humanize} [#{file_name}]\n".colorize(source.downloaded? ? :green : :yellow)
+    else
+      source.download_failed!
+      print "Failed :(\n".red
+    end
+
+    source
   end
 
   def extract_file(source, file)
@@ -41,6 +52,8 @@ class Downloader
       `unrar x #{('-p' + password) if password} #{folder}/#{escaped_file} #{folder} && rm #{folder}/#{escaped_file}`
     elsif file.end_with? 'zip'
       `unzip #{('-P ' + password) if password} #{folder}/#{escaped_file} -d #{folder} && rm #{folder}/#{escaped_file}`
+    elsif file.end_with? '7z'
+      `7z x #{('-p' + password) if password} #{folder}/#{escaped_file} -o#{folder} && rm #{folder}/#{escaped_file}`
     end
 
     # If we extracted a folder, move the files out of it
@@ -61,10 +74,13 @@ class Downloader
   end
 
   def check_downloaded(source, folder)
-    if Dir.glob("#{folder}/*.mp3", File::FNM_CASEFOLD).count != source.album.tracks
-      source.download_mismatched!
-    else
+    if source.album.tracks.nil?
+      print "No tracks info.\n".yellow
       source.downloaded!
+    elsif Dir.glob("#{folder}/*.mp3", File::FNM_CASEFOLD).count == source.album.tracks
+      source.downloaded!
+    else
+      source.download_mismatched!
     end
 
     new_folder = "#{download_path}/#{folder_name(source)}"

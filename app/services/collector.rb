@@ -2,6 +2,7 @@ class Collector
   @@crawlers = [
     Collector::Smboemi,
     Collector::Jugorockforever,
+    Collector::Jugozvuk,
     Collector::MuzikaBalkana,
     Collector::Nostalgicno,
     Collector::SlovenianAlternative,

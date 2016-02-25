@@ -1,6 +1,6 @@
 class Uploader
 
-  CURRENT_DRIVE_ID = 19
+  CURRENT_DRIVE_ID = 4
 
   def start(*ids)
     ids = Source.downloaded.pluck(:album_id) if ids.empty?
@@ -21,6 +21,8 @@ class Uploader
 
   def upload_folder(album)
     FileUtils.copy_entry("#{download_path}/#{album.id}", "#{upload_path}/#{album.id}")
+    FileUtils.rm_r("#{upload_path}/#{album.id}/.DS_Store") if File.directory?("#{upload_path}/#{album.id}/.DS_Store")
+
     success = system("#{drive_program} push -no-prompt=true '#{upload_path}/#{album.id}'")
     return nil if !success
 

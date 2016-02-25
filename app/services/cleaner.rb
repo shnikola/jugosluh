@@ -67,11 +67,10 @@ class Cleaner
       print "Multiple: #{albums.map(&:to_s).join(', ')}\n".light_blue if albums.count > 1
 
       album = albums.first
-      if source.catnum? && source.catnum == album.catnum
-        print "#{album} (#{album.year}) [#{album.id}]\n".green
-      else
-        print "#{album} (#{album.year}) [#{album.id}]\n".yellow
-      end
+
+      print "#{album} (#{album.year}) [#{album.id}]".colorize(source.catnum == album.catnum ? :green : :yellow)
+      print " Maybe not in YU".red if album.in_yu.nil?
+      print "\n"
 
       source.update_attributes(album_id: album.id)
     end
@@ -84,20 +83,34 @@ class Cleaner
     connect_unmatched_sources(source_ids: source_ids)
   end
 
+  # ==== After download:
 
-  def find_missing_years
-    # Search discogs updates
-    Album.original.maybe_in_yu.where(year: nil).find_each do |album|
-      next if album.discogs_release_id.blank?
-      release = DiscogsYu.find_by_id(album.discogs_release_id)
-      if release.year.to_i > 0
-        album.update(year: release.year)
-        print "#{album} [#{album.year}] (#{album.id})\n".green
+  def after_download(album_ids)
+    return if album_ids.blank?
+    clean_incomplete_sources(album_ids)
+    find_missing_years(album_ids)
+  end
+
+  def clean_incomplete_sources(album_ids = nil)
+    print "\nCleaning incoplete sources...\n".on_blue
+    sources = album_ids ? Source.where(album_id: album_ids) : Source.all
+    downloader = Downloader.new
+    sources.incomplete.find_each do |source|
+      current_folder = "#{Rails.root}/tmp/downloads/#{downloader.folder_name(source)}"
+      if Source.downloaded.where(album_id: source.album_id).exists?
+        print "Found complete #{source.album}, cleaning #{source.title} (#{source.id})\n".green
+        source.downloaded!
+        `rm -r #{current_folder}`
       end
     end
+  end
+
+  def find_missing_years(album_ids = nil)
+    print "\nSearching for missing years...\n".on_blue
+    sources = album_ids ? Source.where(album_id: album_ids) : Source.all
 
     # Search from sources
-    Source.downloaded.includes(:album).where(albums: {year: nil}).find_each do |source|
+    sources.downloaded.includes(:album).where(albums: {year: nil}).find_each do |source|
       next if source.album.year? # We might have updated it from a previous source
       year = source.title.match(/\b(19\d\d)\b/).try(:[], 1)
       if year
@@ -107,8 +120,6 @@ class Cleaner
       end
     end
   end
-
-  # ==== After download:
 
   # WARNING: this one produced a lot of manual work, try to make it smarter
   # it found a lot of undetected duplicates though
@@ -151,54 +162,6 @@ class Cleaner
     end
   end
 
-  def clean_incomplete_sources
-    downloader = Downloader.new
-    Source.incomplete.find_each do |source|
-      current_folder = "#{Rails.root}/tmp/downloads/#{downloader.folder_name(source)}"
-      if Source.downloaded.where(album_id: source.album_id).exists?
-        print "Found complete #{source.album}, cleaning #{source.title} (#{source.id})\n".green
-        source.downloaded!
-        `rm -r #{current_folder}`
-      end
-    end
-  end
-
-  def browse_mismatched_sources
-    downloader = Downloader.new
-    Source.download_mismatched.find_each do |source|
-      print "#{source.title} :: #{source.album} (#{source.album.year})\n"
-      print "  Source ID: #{source.id}\n"
-      print "  Album ID: #{source.album_id}\n"
-      print "  Tracks: #{source.album.tracks}\n"
-      print "  URL: #{source.album.info_url}\n"
-
-      current_folder = "#{Rails.root}/tmp/downloads/#{downloader.folder_name(source)}"
-      `open #{current_folder}`
-      command = gets.strip
-      case command
-      when /^a/
-        album_id = command.split(":").last if command.include?(":")
-        source.update_attributes(album_id: album_id) if album_id
-        downloader.check_downloaded(source, current_folder)
-      when /^c/
-        _, label, catnum, artist, year, title, tracks = command.split(":")
-        album = Album.create(label: label, catnum: catnum, year: year, artist: artist, title: title, tracks: tracks, in_yu: 1)
-        source.update_attributes(album_id: album.id)
-        downloader.check_downloaded(source, current_folder)
-      when /^i/
-        source.incomplete!
-      when /^n/
-        source.skipped!
-        source.update_attributes(album_id: nil)
-        `rm -r #{current_folder}`
-      when /^r/
-        source.confirmed!
-        source.update_attributes(album_id: nil)
-        `rm -r #{current_folder}`
-      end
-    end
-  end
-
   private
 
   def possible_matches(source)
@@ -217,8 +180,10 @@ class Cleaner
     if source.title.present?
       title = source.title.downcase
       title = title.gsub(/19\d\d/, '').gsub(/[–-]\s+\d\s+[–-]/, '') # years confuse me
-      title = title.gsub(/\[.+\]/, '') # angle bracket content too
-      title = title.gsub(/[^[:word:]\s]/, '') # Remove all interpunction (and ugly invisibles)
+      title = title.gsub(/\(.+\)/, '').gsub(/\[.+\]/, '') # all bracket content too
+      title = title.gsub(/\bi\b/i, '') # "i" is sometimes "&", let's just remove it
+      title = title.gsub(/razni\s+izvo\p{L}+/i, '') # razni izvodjaci
+      title = title.gsub(/[^[:word:]\s]/, ' ') # Remove all interpunction (and ugly invisibles)
 
       releases = []
       releases += DiscogsYu.search_by_name(title, 1)
@@ -227,7 +192,7 @@ class Cleaner
       releases.each do |release|
         album = Album.find_by(discogs_release_id: release.id).try(:original)
         album ||= Importer.new.import_release(release)
-        possible << album if album.in_yu?
+        possible << album if album.maybe_in_yu?
       end
     end
 
@@ -252,12 +217,16 @@ class Cleaner
       catnum =~ /(^EBK-)|(^EVK-)|(^K-)|(^LPD-)|(^SBK-0)|(^SVK-1)/
     when /Diskoton/i
       true
+    when /Šumadija/i
+      true
+    when /PGP Radio Kruševac/i
+      true
     when /Suzy/i
       catnum =~ /(^KS)|(^LP-)|(^SP-)/
     when /RTV Ljubljana/i
       catnum =~ /(^KD-)|(^LD-)|(^SD-)/
     when /Jugodisk/i
-      catnum =~ /(^BDN-)|(^JDN-)|(^LPD-0)/
+      catnum =~ /(^BDN-)|(^JDN-)|(^LPD-0)|(^SVK-)/
     end
   end
 

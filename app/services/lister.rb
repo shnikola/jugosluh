@@ -14,8 +14,7 @@ class Lister
   end
 
   def list_catnums
-    total = 0
-    estimated_total = 0
+    total = Hash.new { |h, k| h[k] = { count: 0, estimated: 0} }
     labels = {
       "Jugoton" => ["C", "SY", "EPY", "LSY"],
       "PGP RTB" => [], # TODO
@@ -47,16 +46,58 @@ class Lister
             print "\n"
           end
         end
-        total += catnums.count
-        estimated_total += prefix_estimated_total
+        total[label][:count] += catnums.count
+        total[label][:estimated] += prefix_estimated_total
         print "Collected #{catnums.count}/#{prefix_estimated_total} (#{(100.0 * catnums.count / prefix_estimated_total).round(2)}%)".on_blue
         print "\n\n"
       end
     end
 
     print "\n\n"
-    print "TOTAL: #{total}/#{estimated_total} (#{(100.0 * total / estimated_total).round(2)}%)".on_blue
-    print "\n"
+    total.each do |label, totals|
+      print "#{label.ljust(20)}:".on_red
+      print "  "
+      print "#{totals[:count]}/#{totals[:estimated]}".ljust(10)
+      print "(#{(100.0 * totals[:count] / totals[:estimated]).round(2)}%)".on_blue
+      print "\n"
+    end
   end
+
+  def browse_mismatched_sources
+    downloader = Downloader.new
+    Source.download_mismatched.find_each do |source|
+      print "#{source.title} :: #{source.album} (#{source.album.year})\n"
+      print "  Source ID: #{source.id}\n"
+      print "  Album ID: #{source.album_id}\n"
+      print "  Tracks: #{source.album.tracks}\n"
+      print "  URL: #{source.album.info_url}\n"
+
+      current_folder = "#{Rails.root}/tmp/downloads/#{downloader.folder_name(source)}"
+      `open #{current_folder}`
+      command = gets.strip
+      case command
+      when /^a/ # another album
+        album_id = command.split(":").last if command.include?(":")
+        source.update_attributes(album_id: album_id) if album_id
+        downloader.check_downloaded(source, current_folder)
+      when /^c/ # create new album
+        _, label, catnum, artist, year, title, tracks = command.split(":")
+        album = Album.create(label: label, catnum: catnum, year: year, artist: artist, title: title, tracks: tracks, in_yu: 1)
+        source.update_attributes(album_id: album.id)
+        downloader.check_downloaded(source, current_folder)
+      when /^i/ # incomplete
+        source.incomplete!
+      when /^n/ # skip
+        source.skipped!
+        source.update_attributes(album_id: nil)
+        `rm -r #{current_folder}`
+      when /^r/
+        source.confirmed!
+        source.update_attributes(album_id: nil)
+        `rm -r #{current_folder}`
+      end
+    end
+  end
+
 
 end
