@@ -10,11 +10,20 @@
 
     .album-buttons
       = link_to "Info", @album.info_url, target: '_blank', class: 'pure-button' if @album.info_url
-      = link_to "Open", @album.download_url, data: {popup: true}, class: 'pure-button pure-button-primary' if @album.download_url
-      = album_playlist_link "Play", @album.download_url, class: 'pure-button' if @album.download_url
-      .add-to-list=link_to "Dodaj na listu", new_user_list_album_path(album_id: @album.id)
-      .report=link_to "Prijavi pogrešku", new_album_issue_path(album_id: @album.id)
-
+      = link_to "Play", tracks_album_url(@album), class: 'play-button pure-button pure-button-primary' if @album.download_url
+      = link_to "Open", @album.download_url, data: {popup: true}, class: 'pure-button' if @album.download_url
+      .minor-links
+        =link_to "Dodaj na listu", new_user_list_album_path(album_id: @album.id)
+        |
+        =link_to "Prijavi pogrešku", new_album_issue_path(album_id: @album.id)
+  
+  %section.player-container
+    %audio.player{controls: true}
+    .playlist
+      %span.prev <<
+      %span.title
+      %span.next >>
+  
   %section.album-comments
     %h3 Recenzije
 

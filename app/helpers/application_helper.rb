@@ -18,13 +18,6 @@ module ApplicationHelper
     "#{'uploaded' if album.uploaded?} #{'listened' if album.user_ratings.any?{|ur| ur.user_id == current_user.id}}"
   end
 
-  def album_playlist_link(label, url, options = {})
-    form_tag("http://sluh.droba.org/", method: :post, target: '_blank', class: 'playlist-form') do
-      hidden_field_tag(:drive_dir_url, url) +
-      submit_tag(label, options)
-    end
-  end
-
   def decade_options
     [["Sva", nil], "50", "60", "70", "80", "90"]
   end

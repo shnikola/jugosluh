@@ -43,22 +43,23 @@
     max-width: 400px;
   }
 
-  .playlist-form {
-    display: inline-block;
-  }
-
   .details {
     margin-bottom: 10px;
   }
 
-  .add-to-list {
+  .minor-links {
     font-size: 13px;
     margin: 10px 0;
   }
 
-  .report {
-    font-size: 13px;
-    margin: 10px 0;
+  .player-container {
+    display: none;
+    
+    width: 300px;
+    margin: auto;
+    .title { font-size: 12px; }
+    .prev {float: left; cursor: pointer;}
+    .next {float: right; cursor: pointer;}
   }
 
   .user-rating {

@@ -21,4 +21,9 @@ class AlbumsController < ApplicationController
     scope = scope.where(label: session[:whitelist_labels]) if session[:whitelist_labels].present?
     redirect_to scope.random
   end
+  
+  def tracks
+    @album = Album.find(params[:id])
+    render json: AlbumTracks.fetch(@album)
+  end
 end
