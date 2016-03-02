@@ -1,8 +1,8 @@
 require 'mina/bundler'
 require 'mina/rails'
 require 'mina/git'
-# require 'mina/rbenv'  # for rbenv support. (http://rbenv.org)
-require 'mina/rvm'    # for rvm support. (http://rvm.io)
+require 'mina/rbenv'  # for rbenv support. (http://rbenv.org)
+# require 'mina/rvm'    # for rvm support. (http://rvm.io)
 
 require 'mina/unicorn'
 
@@ -13,12 +13,9 @@ require 'mina/unicorn'
 #   branch       - Branch name to deploy. (needed by mina/git)
 
 set :domain, '46.101.252.147'
-set :deploy_to, '/home/jugosluh'
+set :deploy_to, '/home/app/jugosluh'
 set :repository, 'https://github.com/shnikola/jugosluh.git'
 set :branch, 'master'
-
-# For system-wide RVM install.
-set :rvm_path, '/usr/local/rvm/scripts/rvm'
 
 # Manually create these paths in shared/ (eg: shared/config/database.yml) in your server.
 # They will be linked in the 'deploy:link_shared_paths' step.
@@ -34,10 +31,7 @@ set :shared_paths, ['config/database.yml', 'config/secrets.yml', 'log', 'tmp/soc
 task :environment do
   # If you're using rbenv, use this to load the rbenv environment.
   # Be sure to commit your .ruby-version or .rbenv-version to your repository.
-  # invoke :'rbenv:load'
-
-  # For those using RVM, use this to load an RVM version@gemset.
-  invoke :'rvm:use[ruby-2.2.1]'
+  invoke :'rbenv:load'
 end
 
 # Put any custom mkdir's in here for when `mina setup` is ran.
@@ -81,4 +75,3 @@ end
 #  - http://nadarei.co/mina/tasks
 #  - http://nadarei.co/mina/settings
 #  - http://nadarei.co/mina/helpers
-
