@@ -12,6 +12,7 @@ require 'mina/unicorn'
 #   repository   - Git repo to clone from. (needed by mina/git)
 #   branch       - Branch name to deploy. (needed by mina/git)
 
+set :user, 'app'
 set :domain, '46.101.252.147'
 set :deploy_to, '/home/app/jugosluh'
 set :repository, 'https://github.com/shnikola/jugosluh.git'
