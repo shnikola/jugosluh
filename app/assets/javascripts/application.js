@@ -31,25 +31,23 @@ $(function() {
   function initPlayer() {
     $(".player-container").show();
     $(".player-container .prev").on("click", function() {
-      currentTrack = (currentTrack - 1 + tracklist.length) % tracklist.length;
-      play(currentTrack);
+      play(currentTrack - 1);
     });
     $(".player-container .next").on("click", function() {
-      currentTrack = (currentTrack + 1) % tracklist.length;
-      play(currentTrack);
+      play(currentTrack + 1);
     });
     $(audio).on("ended", function() {
       if (currentTrack < tracklist.length - 1) {
-        currentTrack ++;
-        play(currentTrack);
+        play(currentTrack + 1);
       }
     });
   }
   
   function play(track) {
-    audio.src = tracklist[track].url;
+    currentTrack = (track + tracklist.length) % tracklist.length;
+    audio.src = tracklist[currentTrack].url;
     audio.load();
     audio.play();
-    $(".player-container .title").text(tracklist[track].title)
+    $(".player-container .title").text(tracklist[currentTrack].title)
   }
 });
