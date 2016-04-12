@@ -29,6 +29,12 @@ class Collector
       download_url = download_link['href'].strip if download_link
 
       if download_url.blank?
+        # download_link = post.css('a[href*="depositfiles"]').first
+        # download_url = download_link['href'].strip if download_link
+        # if download_url && Nokogiri::HTML(open(download_url)).css("body.page_download_gateway").present?
+        #   print "#{title}: "
+        #   print "#{download_url}\n".green
+        # end
         print "...No link found.\n".red if @options[:trace]
         return
       elsif Source.where(download_url: download_url).exists?

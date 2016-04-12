@@ -20,6 +20,7 @@ class Downloader
       "yadi.sk" => :yadi,
       "zippyshare.com" => :zippyshare,
       "mediafire.com" => :mediafire,
+      "4shared.com" => :four_shared,
     }
 
     def get_file(url)
@@ -78,12 +79,12 @@ class Downloader
     end
 
     def get_one_drive(url)
-      watir_download do
+      watir_download(900) do
         browser.cookies.clear
         browser.goto url
         browser.div(class: 'CommandBar').wait_until_present
         sleep 2
-        browser.divs(class: 'CommandBarItem-link').last.click
+        browser.div(class: 'CommandBar-mainArea').div(class: 'CommandBarItem').click
       end
     end
 
@@ -118,6 +119,28 @@ class Downloader
         sleep 5 # Wait for href to be set up
         browser.element(id: 'dlbutton').when_present.click
       end
+    end
+
+    def get_four_shared(url)
+      four_shared_login
+      direct_url = url.gsub(/4shared.com\/\w+\//, "4shared.com/get/")
+      watir_download do
+        browser.goto url # For some reason we need to visit this first
+        sleep 5
+        browser.goto direct_url
+        browser.element(class: 'freeDownloadButton').when_present.click
+      end
+    end
+
+    def four_shared_login
+      return if @four_shared_logged_in
+      browser.goto "https://www.4shared.com/web/login"
+      browser.element(id: "tform").wait_until_present
+      browser.element(id: "tform").text_field(name: "login").set("jugosluh@gmail.com")
+      browser.element(id: "tform").text_field(name: "password").set("qwertz")
+      browser.element(class: "loginButton").click
+      sleep 5
+      @four_shared_logged_in = true
     end
 
     private
@@ -168,10 +191,16 @@ class Downloader
 
       # Use uBlock Origin
       switches = [
-        '--load-extension=/Users/nikola/Library/Application Support/Google/Chrome/Default/Extensions/cjpalhdlnbpafiamejdnhcphjbkeiagm/1.6.0_0'
+        "--load-extension=#{adblock_path}"
       ]
 
       {desired_capabilities: caps, switches: switches}
+    end
+
+    def adblock_path
+      path = '/Users/nikola/Library/Application Support/Google/Chrome/Default/Extensions/cjpalhdlnbpafiamejdnhcphjbkeiagm'
+      version = `ls "#{path}"`
+      path + "/" + version.strip
     end
   end
 end

@@ -35,6 +35,7 @@ module Catnum
 
   def self.normalize(catnum)
     clean = catnum.to_lat.upcase.gsub(/[\s–-]+/, "")
+    return catnum if clean.blank?
     # Group together letters and numbers
     split = clean.scan(/\p{Alpha}+|\p{Digit}+|[^\p{Alpha}\p{Digit}]+/u)
     grouped = split.inject{|total, s| total.last =~ /\p{Alpha}|\p{Digit}/u && s.first =~ /\p{Alpha}|\p{Digit}/u ? "#{total}-#{s}" : "#{total}#{s}"}

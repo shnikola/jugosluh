@@ -52,6 +52,11 @@ class Collector
         mega_id = text.match(/](!.+)/)[1].strip
         download_url = "https://mega.co.nz/##{mega_id}"
 
+        if title =~ /u[zž]ivo/i
+          print "...Bootleg, skipping.\n" if @options[:trace]
+          next
+        end
+
         if Source.where(download_url: download_url).exists?
           print "...Already collected.\n" if @options[:trace]
           next

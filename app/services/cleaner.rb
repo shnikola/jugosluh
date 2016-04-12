@@ -57,10 +57,10 @@ class Cleaner
   def connect_unmatched_sources(album_ids: nil, source_ids: nil)
     print "\nConnecting unmatched sources...\n".on_blue
     sources = source_ids ? Source.where(id: source_ids) : Source.all
+    sources = sources.where(catnum: Album.where(id: album_ids).pluck(:catnum).compact) if album_ids.present?
 
     sources.confirmed.unconnected.find_each do |source|
       albums = possible_matches(source)
-      albums.select!{ |a| album_ids.include?(a.id) } if album_ids.present?
       next if albums.empty?
 
       print "#{source.title} [#{source.id}]\n"
@@ -70,7 +70,7 @@ class Cleaner
 
       print "#{album} (#{album.year}) [#{album.id}]".colorize(source.catnum == album.catnum ? :green : :yellow)
       print " Maybe not in YU".red if album.in_yu.nil?
-      print "\n"
+      print "\n\n"
 
       source.update_attributes(album_id: album.id)
     end
@@ -123,7 +123,7 @@ class Cleaner
 
   # WARNING: this one produced a lot of manual work, try to make it smarter
   # it found a lot of undetected duplicates though
-  def recheck_downloaded_sources(source_ids = [])
+  def recheck_downloaded_sources(source_ids = nil)
     sources = source_ids ? Source.where(id: source_ids) : Source.all
 
     sources.downloaded.joins(:album).where("sources.catnum IS NOT NULL AND sources.catnum != albums.catnum").each do |source|
@@ -139,26 +139,30 @@ class Cleaner
     end
   end
 
-  def reconnect_mismatched_sources
+  def reconnect_mismatched_sources(source_ids: nil)
     downloader = Downloader.new
-    Source.download_mismatched.find_each do |source|
+    sources = source_ids ? Source.where(id: source_ids) : Source.all
+    sources.download_mismatched.find_each do |source|
+      folder = "#{downloader.download_path}/#{downloader.folder_name(source)}"
       albums = possible_matches(source).reject{|a| a.id == source.album_id}
-      next if albums.empty?
-
-      print "#{source.title} [#{source.id}]\n"
-      print "Multiple: #{albums.map(&:to_s).join(', ')}\n".light_blue if albums.count > 1
-
-      album = albums.first
-      if source.catnum? && source.catnum == album.catnum
-        print "#{album} (#{album.year}) [#{album.id}]\n".green
-      else
-        # next
-        print "#{album} (#{album.year}) [#{album.id}]\n".yellow
+      album = albums.find {|a| downloader.track_count_matches?(a, folder)}
+      if album
+        color = Source.downloaded.exists?(album_id: album.id) ? :yellow : :green
+        print "#{source.title} [#{source.id}]\n"
+        print "#{album} (#{album.year}) [#{album.id}]\n\n".colorize(color)
+        source.update_attributes(album_id: album.id)
+        downloader.check_downloaded(source, folder)
       end
+    end
+  end
 
-      current_folder = "#{Rails.root}/tmp/downloads/#{downloader.folder_name(source)}"
-      source.update_attributes(album_id: album.id)
-      downloader.check_downloaded(source, current_folder)
+  def clean_nonyu_sources
+    Source.includes(:album).where("status >= 0").where(albums: {in_yu: false}).each do |source|
+      #dir = "#{Rails.root}/tmp/downloads/#{Downloader.new.folder_name(source)}"
+      #FileUtils.rm_r(dir) if File.directory?(dir)
+      #source.skipped!
+      print "#{source.title} [#{source.id}]\n"
+      print "#{source.album} (#{source.album.year}) [#{source.album.id}]\n\n".green
     end
   end
 

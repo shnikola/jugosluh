@@ -16,14 +16,14 @@
         =link_to "Dodaj na listu", new_user_list_album_path(album_id: @album.id)
         |
         =link_to "Prijavi pogrešku", new_album_issue_path(album_id: @album.id)
-  
+
   %section.player-container
     %audio.player{controls: true}
     .playlist
       %span.prev <<
       %span.title
       %span.next >>
-  
+
   %section.album-comments
     %h3 Recenzije
 

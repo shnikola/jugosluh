@@ -5,10 +5,11 @@ class Downloader
 
   include Downloader::Domains
 
-  def start(from_id = nil)
+  def start(source_ids = nil)
     downloaded = []
 
-    Source.to_download.where("id >= ?", from_id || 0).find_each do |source|
+    sources = source_ids ? Source.where(id: source_ids) : Source.all
+    sources.to_download.find_each do |source|
       download_source(source)
       downloaded << source.album if source.downloaded?
     end
@@ -21,8 +22,8 @@ class Downloader
     print "S: #{source.title} (#{source.id})\n"
     print "A: #{source.album} #{source.album.year} (#{source.album_id})\n"
 
-    if existing_source = Source.downloaded.where(album_id: source.album_id).first
-      print "Already downloaded as #{existing_source.title} (#{existing_source.id})\n".light_blue
+    if Source.downloaded.exists?(album_id: source.album_id) || source.album.uploaded?
+      print "Already downloaded\n".light_blue
       source.downloaded!
       return source
     end
@@ -56,11 +57,8 @@ class Downloader
       `7z x #{('-p' + password) if password} #{folder}/#{escaped_file} -o#{folder} && rm #{folder}/#{escaped_file}`
     end
 
-    # If we extracted a folder, move the files out of it
-    extracted = Dir.glob("#{folder}/*")
-    if extracted.size == 1 && File.directory?(extracted.first)
-      `mv #{extracted.first.shellescape}/* #{folder}/ && rm -r #{extracted.first.shellescape}`
-    end
+    `find #{folder} -mindepth 2 -type f -exec mv {} #{folder} \\;` # Move all the files out of folders
+    `find #{folder} -empty -type d -delete` # Delete all empty folders
 
     # Fix permissions
     `chmod -R 777 "#{folder}"`
@@ -69,6 +67,7 @@ class Downloader
     `find "#{folder}" -name '*.db' -delete`
     `find "#{folder}" -name '*.ico' -delete`
     `find "#{folder}" -name '*.ini' -delete`
+    `find "#{folder}" -name '*.url' -delete`
 
     folder
   end
@@ -77,7 +76,7 @@ class Downloader
     if source.album.tracks.nil?
       print "No tracks info.\n".yellow
       source.downloaded!
-    elsif Dir.glob("#{folder}/*.mp3", File::FNM_CASEFOLD).count == source.album.tracks
+    elsif track_count_matches?(source.album, folder)
       source.downloaded!
     else
       source.download_mismatched!
@@ -88,6 +87,10 @@ class Downloader
 
     new_folder += "_d" if File.directory?(new_folder)
     FileUtils.mv(folder, new_folder)
+  end
+
+  def track_count_matches?(album, folder)
+    Dir.glob("#{folder}/*.mp3", File::FNM_CASEFOLD).count == album.tracks
   end
 
   def folder_name(source)

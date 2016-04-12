@@ -1,13 +1,14 @@
 class Collector
   @@crawlers = [
-    Collector::Smboemi,
+    #Collector::Smboemi,
     Collector::Jugorockforever,
     Collector::Jugozvuk,
     Collector::MuzikaBalkana,
+    Collector::MuzikaNarodna,
     Collector::Nostalgicno,
     Collector::SlovenianAlternative,
     Collector::Samosviraj,
-    Collector::Yukebox
+    Collector::Yukebox,
   ]
 
   def initialize(**options)
