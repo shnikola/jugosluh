@@ -1,11 +1,12 @@
 .home-page
-
+  
   %section.stats
     = homepage_progress_bar(@stats)
     
   %section.start-actions
-    %h3 Slušaj:
-    = link_to "Random", random_albums_path, class: 'pure-button pure-button-primary'
+    %h3 Slušaj random:
+    = link_to "Štogod", random_albums_path, class: 'pure-button pure-button-primary'
+    = link_to "Po naslovnici", random_showcase_albums_path, class: 'pure-button pure-button-primary'
     = link_to "Settings", settings_path, class: 'settings-link'
     
     .or ili odaberi:
@@ -13,9 +14,10 @@
     - [50, 60, 70, 80].each do |d|
       = link_to "#{d}-te", albums_path(decade: d), class: 'tag-link'
     = link_to "pretraži sve", albums_path, class: 'tag-link highlighted'
+  
+  - if current_user.user_ratings.exists?
+    %section.latest-comments
+      %h3 Najnovije recenzije
 
-  %section.latest-comments
-    %h3 Najsvježiji komentari
-
-    - @user_ratings.each do |user_rating|
-      = render partial: 'home/user_rating', object: user_rating
+      - @user_ratings.each do |user_rating|
+        = render partial: 'home/user_rating', object: user_rating

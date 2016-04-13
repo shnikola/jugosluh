@@ -6,6 +6,7 @@ Rails.application.routes.draw do
 
   resources :albums, only: [:index, :show] do
     get :random, on: :collection
+    get :random_showcase, on: :collection
     get :tracks, on: :member
   end
 
@@ -16,4 +17,8 @@ Rails.application.routes.draw do
   resources :album_issues, only: [:index, :new, :create]
   
   resource :settings, only: [:show, :update]
+  
+  namespace :api do
+    resources :albums
+  end
 end

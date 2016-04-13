@@ -10,7 +10,7 @@ class Album < ActiveRecord::Base
   scope :unresolved, -> { where(in_yu: nil) }
 
   def self.random
-    order("RAND()").first
+    order("RAND()")
   end
 
   def self.search(query)
@@ -53,6 +53,10 @@ class Album < ActiveRecord::Base
 
   def info_attributes
     attributes.except("id", "duplicate_of_id", "download_url", "drive_id", "average_rating")
+  end
+  
+  def as_json(options = {})
+    attributes.slice("id", "label", "catnum", "year", "artist", "title", "info_url", "image_url", "tracks", "average_rating")
   end
 
 end

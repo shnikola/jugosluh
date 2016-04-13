@@ -1,0 +1,5 @@
+.showcase-page
+  %h2 Odaberi naslovnicu:
+  - @albums.each do |album|
+    = link_to album, class: 'album-cover', target: '_blank' do
+      = image_tag album.image_url, class: 'album-image'
