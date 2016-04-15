@@ -1,0 +1,9 @@
+.user-lists-page
+  %h2 Liste
+  
+  %table.pure-table.pure-table-striped
+    %tbody
+      - @user_lists.each do |user_list|
+        %tr
+          %td #{link_to user_list.name, user_list}
+          %td #{link_to user_list.user, user_list.user}

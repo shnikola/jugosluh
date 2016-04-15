@@ -2,8 +2,8 @@
   %h2 #{@user_list.name}
   %h4 Autor: #{@user_list.user}
   
-  %table.pure-table.pure-table-striped
-    %thead
-      = render 'table_header'
-    %tbody
-      = render partial: 'albums/album', collection: @user_list.albums
+  - @user_list.user_list_albums.each do |list_album|
+    .album
+      = link_to list_album.album, class: 'album-cover', target: '_blank' do
+        = image_tag list_album.album.image_url, class: 'album-image'
+      .note #{list_album.note}

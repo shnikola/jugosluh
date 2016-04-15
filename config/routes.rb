@@ -19,6 +19,7 @@ Rails.application.routes.draw do
   resource :settings, only: [:show, :update]
   
   namespace :api do
-    resources :albums
+    resources :albums, only: [:index]
+    resources :user_ratings, only: [:index]
   end
 end

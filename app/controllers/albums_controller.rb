@@ -17,13 +17,16 @@ class AlbumsController < ApplicationController
   end
   
   def random
-    albums = Album.of_interest.uploaded.random
-    albums = albums.where(label: session[:whitelist_labels]) if session[:whitelist_labels].present?
-    redirect_to albums.first
+    @albums = Album.of_interest.uploaded.random
+    @albums = @albums.where(label: session[:whitelist_labels]) if session[:whitelist_labels].present?
+    @albums = @albums.where.not(id: current_user.user_ratings.pluck(:album_id))
+    redirect_to @albums.first
   end
   
   def random_showcase
     @albums = Album.of_interest.uploaded.random
+    @albums = @albums.where(label: session[:whitelist_labels]) if session[:whitelist_labels].present?
+    @albums = @albums.where.not(id: current_user.user_ratings.pluck(:album_id))
     @albums = @albums.where("image_url IS NOT NULL").first(12)
   end
   

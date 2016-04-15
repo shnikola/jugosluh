@@ -1,5 +1,16 @@
-.user-list-page {
+.user-lists-page {
+  table {
+    width: 500px;
+    margin: auto;
+    text-align: left;
+  }
+}
 
+.user-list-page {
+  .album {
+    margin-bottom: 60px;
+    img { width: 400px; }
+  }
 }
 
 .new-user-list-album-page {
