@@ -6,7 +6,7 @@ Rails.application.routes.draw do
 
   resources :albums, only: [:index, :show] do
     get :random, on: :collection
-    get :random_showcase, on: :collection
+    get :shelf, on: :collection
     get :tracks, on: :member
   end
 

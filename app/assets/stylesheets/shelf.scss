@@ -1,0 +1,20 @@
+.shelf-page {
+  .shelf-albums {
+    margin-bottom: 30px;
+  }
+  
+  .shelf-album {
+    position: relative;
+    display: inline-block;
+    img { height: 200px; }
+    &.rated img { opacity: 0.6; }
+    
+    .rating { 
+      line-height: 40px; width: 40px; height: 40px; 
+      position: absolute; top: 50%; left: 50%;
+      margin-left: -20px; margin-top: -20px;
+    }
+  }
+  
+  
+}

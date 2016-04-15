@@ -1,0 +1,10 @@
+.shelf-page
+  %h2 Tvoja polica:
+  .shelf-albums
+    - @albums.each do |album|
+      = link_to album, class: "shelf-album #{'rated' if @user_ratings[album.id]}", target: '_blank' do
+        = image_tag album.image_url, class: 'album-image'
+        - if @user_ratings[album.id]
+          .rating{class: "r-#{@user_ratings[album.id].rating}"}= @user_ratings[album.id].rating 
+
+  = link_to "Odaberi drugu policu", shelf_albums_path(new: true), class: 'pure-button pure-button-primary'
