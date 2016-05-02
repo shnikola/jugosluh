@@ -54,12 +54,19 @@
 
   .player-container {
     display: none;
-    
+
     width: 300px;
     margin: auto;
-    .title { font-size: 12px; }
-    .prev {float: left; cursor: pointer;}
-    .next {float: right; cursor: pointer;}
+    .track {
+      text-align: left;
+      cursor: pointer;
+      font-size: 12px;
+      background: #ddd;
+      padding: 5px 10px;
+      margin-bottom: 1px;
+      &:hover { background: #ccc; }
+      &.active { background: #333; color: #eee; }
+    }
   }
 
   .user-rating {
