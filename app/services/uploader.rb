@@ -11,7 +11,8 @@ class Uploader
       download_url = upload_folder(album)
 
       if download_url.present?
-        album.update_attributes(download_url: download_url, drive_id: CURRENT_DRIVE_ID)
+        tracklist = fetch_tracks(album)
+        album.update_attributes(download_url: download_url, tracklist: tracklist, drive_id: CURRENT_DRIVE_ID)
         print "Success\n".green
       else
         print "Failed :(\n".red
@@ -32,6 +33,15 @@ class Uploader
       FileUtils.rm_r("#{upload_path}/#{album.id}")
       "https://drive.google.com/folderview?id=#{folder_id}"
     end
+  end
+
+  def fetch_tracks(album)
+    result = `(cd '#{upload_path}' && #{drive_program} list -long --sort name #{album.id})`
+    return nil if result.include?("cannot be found remotely")
+    tracks = result.split("\n").select{ |r| r =~ /mp3$/i }
+    tracks = tracks.map{ |r| r.split("\t").values_at(1, -1) }
+    tracks = tracks.map{ |r| [r[0], r[1].split("/", 3).last].join(";") }
+    tracks.join("\n")
   end
 
   private

@@ -73,7 +73,7 @@ class Downloader
   end
 
   def check_downloaded(source, folder)
-    if source.album.tracks.nil?
+    if source.album.track_count.nil?
       print "No tracks info.\n".yellow
       source.downloaded!
     elsif track_count_matches?(source.album, folder)
@@ -90,7 +90,7 @@ class Downloader
   end
 
   def track_count_matches?(album, folder)
-    Dir.glob("#{folder}/*.mp3", File::FNM_CASEFOLD).count == album.tracks
+    Dir.glob("#{folder}/*.mp3", File::FNM_CASEFOLD).count == album.track_count
   end
 
   def folder_name(source)

@@ -69,7 +69,7 @@ class Lister
       print "#{source.title} :: #{source.album} (#{source.album.year})\n"
       print "  Source ID: #{source.id}\n"
       print "  Album ID: #{source.album_id}\n"
-      print "  Tracks: #{source.album.tracks}\n"
+      print "  Track count: #{source.album.track_count}\n"
       print "  URL: #{source.album.info_url}\n"
 
       current_folder = "#{Rails.root}/tmp/downloads/#{downloader.folder_name(source)}"
@@ -81,8 +81,8 @@ class Lister
         source.update_attributes(album_id: album_id) if album_id
         downloader.check_downloaded(source, current_folder)
       when /^c/ # create new album
-        _, label, catnum, artist, year, title, tracks = command.split(":")
-        album = Album.create(label: label, catnum: catnum, year: year, artist: artist, title: title, tracks: tracks, in_yu: 1)
+        _, label, catnum, artist, year, title, track_count = command.split(":")
+        album = Album.create(label: label, catnum: catnum, year: year, artist: artist, title: title, track_count: track_count, in_yu: 1)
         source.update_attributes(album_id: album.id)
         downloader.check_downloaded(source, current_folder)
       when /^i/ # incomplete

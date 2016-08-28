@@ -37,7 +37,7 @@ class Importer
       discogs_catnum: catnum,
       info_url: release.uri,
       image_url: select_image_url(release.images),
-      tracks: select_tracks(release.tracklist)
+      track_count: count_tracks(release.tracklist)
     )
 
     # Don't overwrite catnum or label
@@ -87,7 +87,7 @@ class Importer
     image.uri if image
   end
 
-  def select_tracks(tracklist)
+  def count_tracks(tracklist)
     tracks = tracklist.select{ |t| t.type_ == "track" && t.title.present? }
     tracks = tracklist.flat_map{ |t| t.sub_tracks.select{ |s| s.type_ == "track" && s.title.present? } } if tracks.count == 0
     tracks.count
