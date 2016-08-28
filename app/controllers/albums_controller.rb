@@ -35,12 +35,6 @@ class AlbumsController < ApplicationController
     @user_ratings = @user_ratings.map{|ur| [ur.album_id, ur]}.to_h
   end
 
-  def tracks
-    @album = Album.find(params[:id])
-    @tracks = AlbumTracks.fetch(@album)
-    render json: @tracks
-  end
-
   private
 
   def random_albums

@@ -1,0 +1,27 @@
+.radio-page {
+
+  .player-container {
+    width: 300px;
+    margin: 0 auto 40px;
+
+    .album-image {
+      width: 100%;
+    }
+
+    .track {
+      text-align: left;
+      cursor: pointer;
+      font-size: 12px;
+      background: #ddd;
+      padding: 5px 10px;
+      margin-bottom: 1px;
+      &:hover { background: #ccc; }
+      &.active { background: #333; color: #eee; }
+    }
+
+    .album-buttons {
+      margin-top: 20px;
+    }
+
+  }
+}

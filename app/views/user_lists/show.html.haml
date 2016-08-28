@@ -1,7 +1,7 @@
 .user-list-page
   %h2 #{@user_list.name}
   %h4 Autor: #{@user_list.user}
-  
+
   - @user_list.user_list_albums.each do |list_album|
     .album
       = link_to list_album.album, class: 'album-cover', target: '_blank' do

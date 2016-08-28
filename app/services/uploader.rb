@@ -40,7 +40,7 @@ class Uploader
     return nil if result.include?("cannot be found remotely")
     tracks = result.split("\n").select{ |r| r =~ /mp3$/i }
     tracks = tracks.map{ |r| r.split("\t").values_at(1, -1) }
-    tracks = tracks.map{ |r| [r[0], r[1].split("/", 3).last].join(";") }
+    tracks = tracks.map{ |r| [r[0], r[1].sub("/#{album.id}/", '').sub(/\.mp3$/i, '')].join(";") }
     tracks.join("\n")
   end
 

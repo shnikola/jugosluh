@@ -13,7 +13,7 @@ class UserListAlbumsController < ApplicationController
     end
 
     @user_list_album.save if !UserListAlbum.exists?(user_list: @user_list_album.user_list, album: @user_list_album.album)
-    redirect_to @user_list_album.album
+    redirect_to @user_list_album.user_list
   end
 
   def destroy

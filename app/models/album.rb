@@ -46,6 +46,14 @@ class Album < ActiveRecord::Base
     download_url.present?
   end
 
+  def tracks
+    return [] if tracklist.blank?
+    tracklist.split("\n").each_with_object([]) do |track, list|
+      id, title = track.split(";", 2)
+      list.push(title: title, url: "https://drive.google.com/uc?id=#{id}")
+    end
+  end
+
   def calculate_average_rating
     self.average_rating = 1.0 * user_ratings.sum("rating") / user_ratings.count if user_ratings.present?
     save

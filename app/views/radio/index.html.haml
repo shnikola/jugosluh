@@ -1,0 +1,12 @@
+.radio-page
+  %h2 Radio
+
+  %section.player-container
+    = image_tag nil, class: 'album-image'
+    %audio.player{controls: true, data: { next_track_url: radio_next_track_path }}
+    .playlist
+      .track
+
+    .album-buttons
+      = link_to "Info", '#', class: 'pure-button pure-button-primary info-link'
+      = link_to "Next", 'javascript:', class: 'pure-button next-track'
