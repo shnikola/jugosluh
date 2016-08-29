@@ -9,7 +9,7 @@ $(function() {
   loadNextTrack();
 
   function initPlayer() {
-    $(".player-container .track").on("click", function() {
+    $(".player-container .track, .player-container .album-image").on("click", function() {
       audio.paused ? audio.play() : audio.pause();
     });
 

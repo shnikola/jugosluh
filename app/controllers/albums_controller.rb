@@ -20,21 +20,6 @@ class AlbumsController < ApplicationController
     redirect_to random_albums.first
   end
 
-  def shelf
-    if params[:new].present?
-      session[:shelf] = []
-      redirect_to shelf_albums_url and return # Lose the param
-    elsif session[:shelf].blank?
-      @albums = random_albums.where("image_url IS NOT NULL").first(12)
-      session[:shelf] = @albums.map(&:id)
-    else
-      @albums = Album.where(id: session[:shelf])
-    end
-
-    @user_ratings = current_user.user_ratings.where(album: @albums)
-    @user_ratings = @user_ratings.map{|ur| [ur.album_id, ur]}.to_h
-  end
-
   private
 
   def random_albums

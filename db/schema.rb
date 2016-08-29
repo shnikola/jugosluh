@@ -11,12 +11,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160827211521) do
+ActiveRecord::Schema.define(version: 20160828035214) do
 
   create_table "album_issues", force: :cascade do |t|
     t.integer  "album_id",   limit: 4
     t.integer  "user_id",    limit: 4
     t.text     "message",    limit: 65535
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "album_sets", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.string   "album_ids",  limit: 255
     t.datetime "created_at"
     t.datetime "updated_at"
   end
