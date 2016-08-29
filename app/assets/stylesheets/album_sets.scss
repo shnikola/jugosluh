@@ -6,6 +6,8 @@
   .album {
     position: relative;
     display: inline-block;
+    margin: 5px;
+    
     img { height: 200px; }
     &.rated img { opacity: 0.6; }
 
