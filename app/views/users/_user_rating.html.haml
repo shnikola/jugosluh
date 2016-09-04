@@ -1,6 +1,6 @@
 %tr
   %td.date-cell= user_rating.created_at.to_formatted_s(:db)
   %td= link_to user_rating.album, user_rating.album
-  %td.review-cell= user_rating.comment
+  %td.review-cell= simple_format(user_rating.comment)
   %td.rating-cell
     .rating{class: "r-#{user_rating.rating}"}= user_rating.rating

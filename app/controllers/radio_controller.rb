@@ -4,10 +4,14 @@ class RadioController < ApplicationController
   end
 
   def next_track
-    albums = Album.of_interest.uploaded.random
-    albums = albums.where(label: session[:whitelist_labels]) if session[:whitelist_labels].present?
-    album = albums.first
-    track = album.tracks.sample
-    render json: { track: track, album: album }
+    albums = Album.of_interest.uploaded
+    albums = albums.from_decade(params[:decade]) if params[:decade].present?
+    albums = albums.where(label: params[:label]) if params[:label].present?
+    album = albums.random.first
+    if album
+      render json: { track: album.tracks.sample, album: album }
+    else
+      render json: {}, status: 404
+    end
   end
 end

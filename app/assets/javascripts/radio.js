@@ -32,7 +32,8 @@ $(function() {
 
   function loadNextTrack(play) {
     $.ajax({
-      url: $(audio).data("next-track-url"),
+      url: $('#next-track-form').attr("action"),
+      data: $('#next-track-form').serialize(),
       success: function(data) {
         $(".player-container .playlist .track").html(data.track.title)
         $(".player-container .album-image").attr("src", data.album.image_url);

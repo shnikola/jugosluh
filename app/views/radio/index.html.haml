@@ -1,12 +1,21 @@
 .radio-page
-  %h2 Radio
+
+  %section.filter
+    = form_tag radio_next_track_path, id: 'next-track-form', class: 'pure-form', method: 'get' do
+      %fieldset
+        = label_tag :decade do
+          Desetljeće:
+          = select_tag :decade, options_for_select(decade_options, params[:decade])
+        = label_tag :label do
+          Izdavač:
+          = select_tag :label, options_for_select(Label.major, params[:label]), include_blank: 'Svi'
 
   %section.player-container
     = image_tag nil, class: 'album-image'
-    %audio.player{controls: true, data: { next_track_url: radio_next_track_path }}
+    %audio.player{controls: true}
     .playlist
       .track
 
     .album-buttons
       = link_to "Info", '#', class: 'pure-button pure-button-primary info-link'
-      = link_to "Next", 'javascript:', class: 'pure-button next-track'
+      %button.pure-button.next-track Next
