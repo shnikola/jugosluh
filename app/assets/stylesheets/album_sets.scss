@@ -9,9 +9,13 @@
     margin: 5px;
 
     img { height: 300px; }
-    &.rated img { opacity: 0.6; }
+    .rating { display: none; }
+  }
 
+  .album.rated:hover {
+    img { opacity: 0.6; }
     .rating {
+      display: block;
       line-height: 40px; width: 40px; height: 40px;
       position: absolute; top: 50%; left: 50%;
       margin-left: -20px; margin-top: -20px;

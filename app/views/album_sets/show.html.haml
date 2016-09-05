@@ -4,7 +4,7 @@
     - @albums.in_groups_of(2).each do |albums|
       .row
         - albums.each do |album|
-          = link_to album, class: "album #{'rated' if @user_ratings[album.id]}", target: '_blank' do
+          = link_to album, class: "album #{'rated' if @user_ratings[album.id]}" do
             = image_tag album.image_url, class: 'album-image'
             - if @user_ratings[album.id]
               .rating{class: "r-#{@user_ratings[album.id].rating}"}= @user_ratings[album.id].rating

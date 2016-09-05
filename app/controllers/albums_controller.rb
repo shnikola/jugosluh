@@ -20,6 +20,13 @@ class AlbumsController < ApplicationController
     redirect_to random_albums.first
   end
 
+  def covers
+    @albums = Album.of_interest.uploaded
+    @albums = @albums.from_decade(params[:decade]) if params[:decade].present?
+    @albums = @albums.random.first(50)
+  end
+
+
   private
 
   def random_albums

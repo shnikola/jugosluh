@@ -6,6 +6,7 @@ Rails.application.routes.draw do
 
   resources :albums, only: [:index, :show] do
     get :random, on: :collection
+    get :covers, on: :collection
   end
 
   resources :album_sets, only: [:index, :show]
