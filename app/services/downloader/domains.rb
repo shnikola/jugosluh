@@ -199,8 +199,8 @@ class Downloader
 
     def adblock_path
       path = '/Users/nikola/Library/Application Support/Google/Chrome/Default/Extensions/cjpalhdlnbpafiamejdnhcphjbkeiagm'
-      version = `ls "#{path}"`
-      path + "/" + version.strip
+      version = `ls "#{path}"`.split("\n").last.strip
+      path + "/" + version
     end
   end
 end
