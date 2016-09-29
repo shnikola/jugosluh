@@ -6,16 +6,16 @@ class Importer
     imported = []
     DiscogsYu.find_each do |release|
       next if latest_version_imported?(release)
-      album = import_release(release)
+      album = import_release(release.id)
       imported << album if album
     end
 
     Cleaner.new.after_import(imported.map(&:id))
   end
 
-  def import_release(release)
-    print "Importing #{release.id} [#{release.title}]... "
-    full_release = DiscogsYu.find_by_id(release.id)
+  def import_release(release_id)
+    full_release = DiscogsYu.find_by_id(release_id)
+    print "Importing #{full_release.id} [#{full_release.title}]... "
     save_to_db(full_release) if full_release
   end
 

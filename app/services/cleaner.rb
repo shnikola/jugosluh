@@ -95,7 +95,7 @@ class Cleaner
     print "\nCleaning incoplete sources...\n".on_blue
     sources = album_ids ? Source.where(album_id: album_ids) : Source.all
     downloader = Downloader.new
-    sources.incomplete.find_each do |source|
+    sources.download_incomplete.find_each do |source|
       current_folder = "#{Rails.root}/tmp/downloads/#{downloader.folder_name(source)}"
       if Source.downloaded.where(album_id: source.album_id).exists?
         print "Found complete #{source.album}, cleaning #{source.title} (#{source.id})\n".green
@@ -195,7 +195,7 @@ class Cleaner
 
       releases.each do |release|
         album = Album.find_by(discogs_release_id: release.id).try(:original)
-        album ||= Importer.new.import_release(release)
+        album ||= Importer.new.import_release(release.id)
         possible << album if album.maybe_in_yu?
       end
     end

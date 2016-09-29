@@ -15,7 +15,7 @@ module ApplicationHelper
   end
 
   def album_row_class(album)
-    "#{'uploaded' if album.uploaded?} #{'listened' if album.user_ratings.any?{|ur| ur.user_id == current_user.id}}"
+    "#{album.uploaded? ? 'uploaded' : 'missing' } #{'listened' if album.user_ratings.any?{|ur| ur.user_id == current_user.id}}"
   end
 
   def decade_options

@@ -96,8 +96,12 @@ class Downloader
   def folder_name(source)
     if source.downloaded?
       "#{source.album_id}"
-    elsif source.incomplete? || source.download_mismatched?
+    elsif source.download_mismatched?
       "t_#{source.album_id}_#{source.id}"
+    elsif source.download_incomplete?
+      "i_#{source.album_id}_#{source.id}"
+    elsif source.download_unknown?
+      "u_#{source.id}"
     else
       "e_#{source.album_id}"
     end

@@ -64,6 +64,9 @@ class Lister
   end
 
   def browse_mismatched_sources
+    print "Total Mismatched: #{Source.download_mismatched.count}\n"
+    print "Total Incomplete: #{Source.download_incomplete.count}\n"
+    print "Total Unknown: #{Source.download_unknown.count}\n\n"
     downloader = Downloader.new
     Source.download_mismatched.find_each do |source|
       print "#{source.title} :: #{source.album} (#{source.album.year})\n"
@@ -79,6 +82,7 @@ class Lister
       when /^a/ # another album
         album_id = command.split(":").last if command.include?(":")
         source.update_attributes(album_id: album_id) if album_id
+        source.album.reload
         downloader.check_downloaded(source, current_folder)
       when /^c/ # create new album
         _, label, catnum, artist, year, title, track_count = command.split(":")
@@ -86,7 +90,12 @@ class Lister
         source.update_attributes(album_id: album.id)
         downloader.check_downloaded(source, current_folder)
       when /^i/ # incomplete
-        source.incomplete!
+        source.download_incomplete!
+        FileUtils.mv(current_folder, "#{Rails.root}/tmp/downloads/#{downloader.folder_name(source)}")
+      when /^u/ # unknown
+        source.download_unknown!
+        source.update_attributes(album_id: nil)
+        FileUtils.mv(current_folder, "#{Rails.root}/tmp/downloads/#{downloader.folder_name(source)}")
       when /^n/ # skip
         source.skipped!
         source.update_attributes(album_id: nil)

@@ -1,6 +1,6 @@
 class Uploader
 
-  CURRENT_DRIVE_ID = 9
+  CURRENT_DRIVE_ID = 19
 
   def start(*ids)
     ids = Source.downloaded.pluck(:album_id) if ids.empty?
@@ -28,7 +28,7 @@ class Uploader
     return nil if !success
 
     result = `#{drive_program} pub '#{upload_path}/#{album.id}'`
-    folder_id = result.match(/https:\/\/googledrive.com\/host\/(.*)$/).try(:[], 1)
+    folder_id = result.split('https://drive.google.com/open?id=').last if result.include?('published')
     if folder_id
       FileUtils.rm_r("#{upload_path}/#{album.id}")
       "https://drive.google.com/folderview?id=#{folder_id}"
