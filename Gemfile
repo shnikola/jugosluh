@@ -19,11 +19,6 @@ gem 'quiet_assets', '~> 1.1.0'
 # Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks
 # gem 'turbolinks'
 
-# bundle exec rake doc:rails generates the API under doc/api.
-gem 'sdoc', '~> 0.4.0',          group: :doc
-
-#gem 'spring', group: :development
-
 gem "discogs-wrapper"
 gem "google-api-client"
 
