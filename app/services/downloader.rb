@@ -57,7 +57,7 @@ class Downloader
       `7z x #{('-p' + password) if password} #{folder}/#{escaped_file} -o#{folder} && rm #{folder}/#{escaped_file}`
     end
 
-    `find #{folder} -mindepth 2 -type f -exec mv {} #{folder} \\;` # Move all the files out of folders
+    `find #{folder} -mindepth 2 -type f -exec mv -f {} #{folder} \\;` # Move all the files out of folders
     `find #{folder} -empty -type d -delete` # Delete all empty folders
 
     # Fix permissions

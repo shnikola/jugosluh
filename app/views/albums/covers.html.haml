@@ -1,6 +1,0 @@
-.album-sets-page
-  - @albums.in_groups_of(2).each do |albums|
-    .row
-      - albums.each do |album|
-        = link_to album, class: "album", target: '_blank' do
-          = image_tag album.image_url, class: 'album-image'

@@ -5,6 +5,7 @@ class Album < ActiveRecord::Base
   scope :of_interest, -> { original.where(in_yu: true) }
   scope :non_discogs, -> { where(discogs_release_id: nil) }
   scope :uploaded, -> { where("download_url IS NOT NULL") }
+  scope :with_cover, -> { where.not(image_url: nil) }
 
   scope :maybe_in_yu, -> { where("in_yu IS NULL OR in_yu = 1") }
   scope :unresolved, -> { where(in_yu: nil) }

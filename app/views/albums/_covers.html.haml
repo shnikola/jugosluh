@@ -1,0 +1,7 @@
+- albums.each do |album|
+  - if album.image_url?
+    = link_to album, class: "album-cover" do
+      = image_tag album.image_url, class: 'album-image', alt: album.to_s
+      .album-info
+        .artist #{album.artist}
+        .title #{album.title} (#{album.year})

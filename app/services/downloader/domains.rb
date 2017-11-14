@@ -99,17 +99,14 @@ class Downloader
     def get_solidfiles(url)
       watir_download do
         browser.goto url
-        sleep 5
-        # Remove overlay
-        browser.execute_script("document.getElementsByClassName('ui-dialog')[0].nextElementSibling.remove()")
-        browser.element(id: 'ddl-text').when_present.click
+        browser.element(class: 'btn-primary').when_present.click
       end
     end
 
     def get_yadi(url)
       watir_download do
         browser.goto url
-        browser.element(class: 'js-download-button').when_present.click
+        browser.element(class: 'button_download').when_present.click
       end
     end
 

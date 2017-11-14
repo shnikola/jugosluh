@@ -4,7 +4,7 @@ class User < ActiveRecord::Base
   has_many :user_lists
 
   devise :database_authenticatable, :rememberable, :trackable, :validatable
-  #devise :registerable
+  devise :registerable
 
   def to_s
     name

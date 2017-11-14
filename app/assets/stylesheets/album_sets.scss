@@ -1,25 +1,15 @@
 .album-sets-page {
-  .shelf-albums {
-    margin-bottom: 30px;
+  width: 500px;
+  margin: auto;
+  text-align: left;
+
+  .intro {
+    margin-bottom: 40px;
   }
 
   .album {
-    position: relative;
-    display: inline-block;
-    margin: 5px;
-
-    img { height: 300px; }
-    .rating { display: none; }
-  }
-
-  .album.rated:hover {
-    img { opacity: 0.6; }
-    .rating {
-      display: block;
-      line-height: 40px; width: 40px; height: 40px;
-      position: absolute; top: 50%; left: 50%;
-      margin-left: -20px; margin-top: -20px;
-    }
+    margin-bottom: 40px;
+    img { height: 400px; }
   }
 
 

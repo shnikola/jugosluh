@@ -21,15 +21,23 @@
         = hidden_field_tag :direction, params[:direction]
         = submit_tag "Traži", class: 'pure-button pure-button-primary'
 
+      %fieldset
+        = label_tag :covers do
+          = check_box_tag :covers, "1", params[:covers], class: 'autosubmit'
+          Prikaži omote
+
 
   %section.albums
 
     = paginate @albums
 
-    %table.pure-table.pure-table-striped
-      %thead
-        = render 'table_header'
-      %tbody
-        = render @albums
+    - if params[:covers].present?
+      = render 'covers', albums: @albums
+    - else
+      %table.pure-table.pure-table-striped
+        %thead
+          = render 'table_header'
+        %tbody
+          = render @albums
 
     = paginate @albums

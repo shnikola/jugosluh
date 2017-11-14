@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160828035214) do
+ActiveRecord::Schema.define(version: 20161012004746) do
 
   create_table "album_issues", force: :cascade do |t|
     t.integer  "album_id",   limit: 4
@@ -22,10 +22,12 @@ ActiveRecord::Schema.define(version: 20160828035214) do
   end
 
   create_table "album_sets", force: :cascade do |t|
-    t.string   "name",       limit: 255
-    t.string   "album_ids",  limit: 255
+    t.string   "name",        limit: 255
+    t.string   "album_ids",   limit: 255
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.text     "intro",       limit: 65535
+    t.text     "albums_json", limit: 65535
   end
 
   create_table "albums", force: :cascade do |t|
@@ -51,16 +53,37 @@ ActiveRecord::Schema.define(version: 20160828035214) do
   add_index "albums", ["catnum"], name: "index_albums_on_catnum", using: :btree
   add_index "albums", ["discogs_release_id"], name: "index_albums_on_discogs_release_id", using: :btree
 
+  create_table "albums_unconfirmed", id: false, force: :cascade do |t|
+    t.integer "id",                 limit: 4,     default: 0, null: false
+    t.string  "label",              limit: 255
+    t.string  "catnum",             limit: 255
+    t.integer "year",               limit: 4
+    t.string  "artist",             limit: 500
+    t.string  "title",              limit: 500
+    t.string  "duplicate_of_id",    limit: 255
+    t.string  "discogs_release_id", limit: 255
+    t.string  "discogs_master_id",  limit: 255
+    t.string  "info_url",           limit: 700
+    t.string  "download_url",       limit: 255
+    t.string  "image_url",          limit: 255
+    t.boolean "in_yu"
+    t.integer "track_count",        limit: 4
+    t.integer "drive_id",           limit: 4
+    t.float   "average_rating",     limit: 24
+    t.string  "discogs_catnum",     limit: 255
+    t.text    "tracklist",          limit: 65535
+  end
+
   create_table "sources", force: :cascade do |t|
     t.string   "artist",       limit: 255
     t.string   "title",        limit: 255
     t.string   "catnum",       limit: 255
     t.text     "details",      limit: 65535
-    t.string   "download_url", limit: 255
-    t.datetime "created_at"
-    t.datetime "updated_at"
     t.integer  "album_id",     limit: 4
     t.integer  "status",       limit: 4,     default: 0
+    t.string   "download_url", limit: 511
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.string   "origin_site",  limit: 255
   end
 
@@ -70,7 +93,7 @@ ActiveRecord::Schema.define(version: 20160828035214) do
     t.string   "title",        limit: 255
     t.string   "catnum",       limit: 255
     t.text     "details",      limit: 65535
-    t.string   "download_url", limit: 255
+    t.string   "download_url", limit: 511
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "album_id",     limit: 4
@@ -84,7 +107,7 @@ ActiveRecord::Schema.define(version: 20160828035214) do
     t.string   "title",        limit: 255
     t.string   "catnum",       limit: 255
     t.text     "details",      limit: 65535
-    t.string   "download_url", limit: 255
+    t.string   "download_url", limit: 511
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "album_id",     limit: 4

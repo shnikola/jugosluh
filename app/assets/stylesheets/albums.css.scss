@@ -7,26 +7,56 @@
   }
 
   .albums {
+
+    .album-cover {
+      text-decoration: none;
+      position: relative;
+      display: inline-block;
+      overflow: hidden;
+      height: 300px;
+      margin: 5px;
+
+      .album-image { height: 100%; }
+
+      .album-info {
+        display: none;
+        box-sizing: border-box;
+        background-color: rgba(0,0,0,0.8);
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%;
+        padding: 15px;
+        font-size: 0.8em;
+        color: white;
+      }
+      .artist { font-weight: 400; margin-bottom: 5px; }
+      &:hover .album-info { display: block; }
+    }
+
     table {
       width: 80%;
       margin: auto;
       text-align: left;
     }
 
-    .label, .ratings {
-      word-break: keep-all;
-      white-space: nowrap;
+    .album-row {
+      .label, .ratings {
+        word-break: keep-all;
+        white-space: nowrap;
+      }
+
+      .ratings {
+        text-align: center;
+      }
+
+      .ratings .rating {
+        display: inline-block;
+        width: 30px; height: 30px; line-height: 30px;
+        margin-right: 5px;
+      }
     }
 
-    .ratings {
-      text-align: center;
-    }
 
-    .ratings .rating {
-      display: inline-block;
-      width: 30px; height: 30px; line-height: 30px;
-      margin-right: 5px;
-    }
 
     .pagination {
       margin: 20px 0;

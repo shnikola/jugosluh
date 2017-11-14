@@ -7,7 +7,7 @@ class AlbumsController < ApplicationController
     @albums = @albums.from_decade(params[:decade]) if params[:decade].present?
     @albums = @albums.where(label: params[:label]) if params[:label].present?
 
-    @albums = @albums.order("#{params[:sort]} #{params[:direction]}") if params[:sort].present?
+    @albums = @albums.order("#{params[:sort].presence || 'year, label, catnum'} #{params[:direction]}")
 
     @albums = @albums.page(params[:page]).per(100)
   end
@@ -19,13 +19,6 @@ class AlbumsController < ApplicationController
   def random
     redirect_to random_albums.first
   end
-
-  def covers
-    @albums = Album.of_interest.uploaded
-    @albums = @albums.from_decade(params[:decade]) if params[:decade].present?
-    @albums = @albums.random.first(50)
-  end
-
 
   private
 

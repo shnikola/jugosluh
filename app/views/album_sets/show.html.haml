@@ -1,10 +1,9 @@
 .album-sets-page
-  %h2 Tjedni paket #{@album_set.name}
-  .shelf-albums
-    - @albums.in_groups_of(2).each do |albums|
-      .row
-        - albums.each do |album|
-          = link_to album, class: "album #{'rated' if @user_ratings[album.id]}" do
-            = image_tag album.image_url, class: 'album-image'
-            - if @user_ratings[album.id]
-              .rating{class: "r-#{@user_ratings[album.id].rating}"}= @user_ratings[album.id].rating
+  %h2 Tjedni paket: #{@album_set.name}
+  = simple_format @album_set.intro, class: 'intro'
+  - @album_set.albums.each do |album, text|
+    .album
+      %h3 #{album.artist} - #{album.title} (#{album.year})
+      = link_to album do
+        = image_tag album.image_url, class: 'album-image'
+      = simple_format text, class: 'story'

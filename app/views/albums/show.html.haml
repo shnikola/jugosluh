@@ -8,7 +8,7 @@
     .details
       #{@album.label}, #{@album.catnum}, #{@album.year}.
 
-    .album-buttons
+    .album-button
       = link_to "Info", @album.info_url, class: 'pure-button' if @album.info_url
       = button_tag "Play", type: 'button', class: 'play-button pure-button pure-button-primary' if @album.tracklist?
       = link_to "Open", @album.download_url, data: {popup: true}, class: 'pure-button' if @album.download_url

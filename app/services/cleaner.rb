@@ -9,31 +9,6 @@ class Cleaner
     connect_unmatched_sources(album_ids: album_ids)
   end
 
-  def detect_yu_music(album_ids = nil)
-    print "\nDetecting confirmed YU music...\n".on_blue
-    albums = album_ids ? Album.where(id: album_ids) : Album.all
-
-    # All after 1991 is not yu
-    resolved = albums.unresolved.where("year > 1991").update_all(in_yu: false)
-    print "Detected #{resolved} articles after 1991.\n".red if resolved > 0
-
-    # Assign originals first
-    albums.unresolved.original.where("year IS NOT NULL").find_each do |album|
-      if yu_catnum_series?(album.label, album.catnum)
-        print "+ #{album.id} #{album.full_info}\n".green
-        album.update_attributes(in_yu: true)
-      elsif foreign_artist?(album.artist)
-        print "- #{album.id} #{album.full_info}\n".red
-        album.update_attributes(in_yu: false)
-      end
-    end
-
-    # Assign duplicates to same as originals
-    albums.unresolved.where.not(duplicate_of_id: nil).find_each do |album|
-      album.update_attributes(in_yu: album.original.in_yu)
-    end
-  end
-
   def detect_duplicates(album_ids = nil)
     print "\nDetecting duplicates...\n".on_blue
     albums = album_ids ? Album.where(id: album_ids) : Album.all
@@ -41,16 +16,39 @@ class Cleaner
     albums.original.order("id DESC").each do |album|
       original = find_original(album)
       next if original.nil?
-      album.update_attributes(duplicate_of_id: original.id)
-      print "Duplicate #{album} (#{album.id}) of #{original} (#{original.id})\n".green
-      print "Already uploaded!\n".red if album.download_url?
-
-      if better_info?(album, original)
-        print "Better info in duplicate, switching.\n".blue
-        duplicate_attrs, original_attrs = album.info_attributes, original.info_attributes
-        original.update_attributes(duplicate_attrs)
-        album.update_attributes(original_attrs)
+      print "Duplicate #{album}, #{album.year} (#{album.id}) of #{original}, #{original.year} (#{original.id})".green
+      if album.download_url?
+        print "Already uploaded, not changing!\n".red
+        next
       end
+
+      album.update_attributes(duplicate_of_id: original.id)
+      Source.where(album_id: album.id).update_all(album_id: original.id)
+    end
+  end
+
+  def detect_yu_music(album_ids = nil)
+    print "\nDetecting confirmed YU music...\n".on_blue
+    albums = album_ids ? Album.unresolved.where(id: album_ids) : Album.unresolved
+
+    # All after 1991 is not yu
+    resolved = albums.where("year > 1991").update_all(in_yu: false)
+    print "Detected #{resolved} articles after 1991.\n".red if resolved > 0
+
+    # Assign originals first
+    albums.original.find_each do |album|
+      if Label.domestic?(album.label, album.catnum) && album.year?
+        print "+ #{album.id} #{album.full_info}\n".green
+        album.update_attributes(in_yu: true)
+      elsif Label.foreign?(album.label, album.catnum)
+        print "- #{album.id} #{album.full_info}\n".red
+        album.update_attributes(in_yu: false)
+      end
+    end
+
+    # Assign duplicates to same as originals
+    albums.where.not(duplicate_of_id: nil).find_each do |album|
+      album.update_attributes(in_yu: album.original.in_yu)
     end
   end
 
@@ -110,11 +108,10 @@ class Cleaner
     sources = album_ids ? Source.where(album_id: album_ids) : Source.all
 
     # Search from sources
-    sources.downloaded.includes(:album).where(albums: {year: nil}).find_each do |source|
+    sources.downloaded.joins(:album).where(albums: {year: nil}).find_each do |source|
       next if source.album.year? # We might have updated it from a previous source
-      year = source.title.match(/\b(19\d\d)\b/).try(:[], 1)
-      if year
-        print "#{source.album} [#{source.album.year}] (#{source.album.id})\n".yellow
+      if source.year
+        print "#{source.album} (#{source.album.id})\n".yellow
         print "#{source.title} [#{year}] (#{source.id})\n\n".green
         source.album.update(year: year)
       end
@@ -203,37 +200,6 @@ class Cleaner
     possible.uniq
   end
 
-  def foreign_artist?(artist)
-    return false if artist.blank? || artist =~ /Various|Unknown artist/i
-    artist_albums = Album.original.where(artist: artist, in_yu: false).where("year < 1990")
-    artist_albums.count > 2
-  end
-
-  def yu_catnum_series?(label, catnum)
-    case label
-    when /Jugoton/i
-      catnum =~ /(^CAY-)|(^EPY-)|(^F-)|(^LPY)|(^LSY-6)|(^MCY-)|(^SY-)/
-    when /PGP RTB/i
-      catnum =~ /(^111)|(^112)|(^15)|(^20)|(^21)|(^23)|(^31)|(^40)|(^41)|(^50)|(^51)|(^80)|(^EP-1)|(^EP-50)|(^EP-6)|(^LP-1)|(^LP-6)|(^NK-)|(^S-1)|(^S-51)|(^S-52)|(^S-6)|(^SF-)/
-    when /Diskos/i
-      catnum =~ /(^EDK-3)|(^EDK-5)|(^LPD-)|(^MDK-)|(^NDK-1)|(^NDK-2)|(^NDK-4)|(^NDK-5)/
-    when /Beograd Disk/i
-      catnum =~ /(^EBK-)|(^EVK-)|(^K-)|(^LPD-)|(^SBK-0)|(^SVK-1)/
-    when /Diskoton/i
-      true
-    when /Šumadija/i
-      true
-    when /PGP Radio Kruševac/i
-      true
-    when /Suzy/i
-      catnum =~ /(^KS)|(^LP-)|(^SP-)/
-    when /RTV Ljubljana/i
-      catnum =~ /(^KD-)|(^LD-)|(^SD-)/
-    when /Jugodisk/i
-      catnum =~ /(^BDN-)|(^JDN-)|(^LPD-0)|(^SVK-)/
-    end
-  end
-
   def find_original(album)
     return if album.discogs_master_id.blank?
     original = Album.original.where("id != ?", album.id).order("id").find_by(discogs_master_id: album.discogs_master_id)
@@ -244,16 +210,4 @@ class Cleaner
     return original
   end
 
-  def better_info?(duplicate, original)
-    if duplicate.label != original.label
-      return true if Label.major?(duplicate.label) && !Label.major?(original.label)
-      return false if !Label.major?(duplicate.label) && Label.major?(original.label)
-    end
-
-    if duplicate.year?
-      return true if original.year.nil? || duplicate.year < original.year
-    end
-
-    return false
-  end
 end

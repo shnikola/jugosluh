@@ -13,7 +13,7 @@ require 'mina/unicorn'
 #   branch       - Branch name to deploy. (needed by mina/git)
 
 set :user, 'app'
-set :domain, '46.101.252.147'
+set :domain, 'pomice'
 set :deploy_to, '/home/app/jugosluh'
 set :repository, 'https://github.com/shnikola/jugosluh.git'
 set :branch, 'master'

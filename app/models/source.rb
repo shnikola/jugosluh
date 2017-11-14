@@ -16,4 +16,7 @@ class Source < ActiveRecord::Base
   scope :unconnected, -> { where(album_id: nil) }
   scope :to_download, -> { confirmed.where("album_id IS NOT NULL") }
 
+  def year
+    title.match(/\b(19\d\d)\b/).try(:[], 1)
+  end
 end

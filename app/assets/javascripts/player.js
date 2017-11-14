@@ -40,15 +40,15 @@ $(function() {
     // Save current time when closing window.
     $(window).on('unload', function() {
       if (!audio.paused) {
-        localStorage.setItem("playing-album-" + albumId, currentTrack + ":" + audio.currentTime);
+        localStorage.setItem("playing-album", albumId + ":" + currentTrack + ":" + audio.currentTime);
       }
     });
 
-    var savedState = localStorage.getItem("playing-album-" + albumId);
-    if (savedState) {
-      localStorage.removeItem("playing-album-" + albumId);
-      var state = savedState.split(":");
-      play(+state[0], +state[1])
+    var savedState = localStorage.getItem("playing-album");
+    savedState = savedState && savedState.split(":");
+    if (savedState && savedState[0] == albumId) {
+      localStorage.removeItem("playing-album");
+      play(+savedState[1], +savedState[2])
     }
 
     playerInitalized = true;

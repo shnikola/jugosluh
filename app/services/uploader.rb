@@ -4,7 +4,7 @@ class Uploader
 
   def start(*ids)
     ids = Source.downloaded.pluck(:album_id) if ids.empty?
-    Album.where(id: ids).where("year IS NOT NULL").order("year").each do |album|
+    Album.where(id: ids).where("year IS NOT NULL").where("track_count IS NOT NULL").order("year").each do |album|
       next if album.uploaded? || !album.in_yu?
 
       print "Uploading [#{album.id}] #{album.full_info} (#{album.year})\n"
