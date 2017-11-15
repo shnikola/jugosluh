@@ -26,7 +26,7 @@ module DiscogsYu
   rescue Discogs::UnknownResource => e
     print "Couldn't find: #{id}\n".black.on_red
     return nil
-  rescue EOFError, OpenSSL::SSL::SSLError, Errno::ECONNRESET => e
+  rescue EOFError, Net::OpenTimeout, OpenSSL::SSL::SSLError, Errno::ECONNRESET => e
     print "#{e}, retrying...\n".black.on_red
     retry
   end
@@ -36,7 +36,7 @@ module DiscogsYu
     options.merge!(per_page: size, page: 1)
     begin
       response = discogs.search(name, options)
-    rescue EOFError, OpenSSL::SSL::SSLError, Errno::ECONNRESET => e
+    rescue EOFError, Net::OpenTimeout, OpenSSL::SSL::SSLError, Errno::ECONNRESET => e
       print "#{e}, retrying...\n".black.on_red
       retry
     end

@@ -50,10 +50,11 @@ class Importer
       print "Catnum Changed! ".red if album.catnum_changed?
     end
 
+    album.year = release.year.to_i if release.year.to_i > 0
+
     album.assign_attributes(
       artist: select_artist_info(release.artists),
       title: release.title.to_lat,
-      year: release.year.to_i > 0 ? release.year.to_i : nil,
       discogs_release_id: release.id,
       discogs_master_id: release.master_id,
       discogs_catnum: original_catnum,
