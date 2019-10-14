@@ -31,7 +31,7 @@ gem 'open_uri_redirections'
 
 gem 'watir-webdriver'
 
-gem 'devise'
+gem 'devise', '>= 4.7.1'
 
 gem 'mina'
 gem 'mina-unicorn', :require => false
@@ -40,6 +40,3 @@ gem 'mina-unicorn', :require => false
 # gem 'bcrypt', '~> 3.1.7'
 
 gem 'unicorn'
-
-# Use debugger
-# gem 'debugger', group: [:development, :test]
