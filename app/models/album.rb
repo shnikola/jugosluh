@@ -1,4 +1,4 @@
-class Album < ActiveRecord::Base
+class Album < ApplicationRecord
   has_many :user_ratings
 
   scope :original, -> { where(duplicate_of_id: nil) }

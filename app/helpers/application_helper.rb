@@ -22,10 +22,15 @@ module ApplicationHelper
     [["Sva", nil], "50", "60", "70", "80", "90"]
   end
 
+  def empty_gif
+    "data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=="
+  end
+
+
   def sortable(column, title = nil)
     title ||= column.titleize
     direction = (column == params[:sort] && params[:direction] == "asc") ? "desc" : "asc"
-    sort_params = params.except(:page).merge(sort: column, direction: direction)
+    sort_params = params.except(:page).merge(sort: column, direction: direction).to_unsafe_h
     link_to title, sort_params
   end
 end

@@ -1,5 +1,5 @@
-class Source < ActiveRecord::Base
-  belongs_to :album
+class Source < ApplicationRecord
+  belongs_to :album, optional: true
 
   enum status: {
     skipped: -1,            # Not related to our research

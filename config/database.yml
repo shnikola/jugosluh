@@ -28,7 +28,6 @@ production:
   adapter: mysql2
   encoding: utf8
   database: jugosluh
-  host: 127.0.0.1
-  username: rails
-  password: <%= ENV['PRODUCTION_DB_PASSWORD'] %>
-  port: 8888
+  username: <%= ENV['DB_USER'] %>
+  password: <%= ENV['DB_PASSWORD'] %>
+  socket: /var/run/mysqld/mysqld.sock

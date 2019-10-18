@@ -11,7 +11,7 @@
           = select_tag :label, options_for_select(Label.major, params[:label]), include_blank: 'Svi'
 
   %section.player-container
-    = image_tag nil, class: 'album-image'
+    = image_tag empty_gif, class: 'album-image'
     %audio.player{controls: true}
     .playlist
       .track

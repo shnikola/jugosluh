@@ -1,10 +1,10 @@
-class User < ActiveRecord::Base
+class User < ApplicationRecord
   has_many :user_ratings
   has_many :album_issues
   has_many :user_lists
 
   devise :database_authenticatable, :rememberable, :trackable, :validatable
-  # devise :registerable
+  devise :registerable if Rails.env.development?
 
   def to_s
     name

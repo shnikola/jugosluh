@@ -14,12 +14,13 @@
       font-size: 14px;
       padding: 20px;
     }
-    
+
     .rating-cell {
       text-align: center;
     }
 
     .rating {
+      display: inline-block;
       line-height: 40px; width: 40px; height: 40px;
     }
   }
