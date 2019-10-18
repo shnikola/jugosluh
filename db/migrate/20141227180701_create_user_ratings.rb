@@ -1,4 +1,4 @@
-class CreateUserRatings < ActiveRecord::Migration
+class CreateUserRatings < ActiveRecord::Migration[5.2]
   def change
     create_table :user_ratings do |t|
       t.integer :user_id
@@ -6,7 +6,7 @@ class CreateUserRatings < ActiveRecord::Migration
       t.integer :rating
       t.text :comment
     end
-    
+
     add_index :user_ratings, :user_id
     add_index :user_ratings, :album_id
   end

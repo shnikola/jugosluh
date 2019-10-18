@@ -1,4 +1,4 @@
-class CreateAlbums < ActiveRecord::Migration
+class CreateAlbums < ActiveRecord::Migration[5.2]
   def change
     create_table :albums do |t|
       t.string :label
@@ -14,7 +14,7 @@ class CreateAlbums < ActiveRecord::Migration
       t.boolean :in_yu
       t.boolean :confirmed, default: false
     end
-    
+
     add_index :albums, :catnum
     add_index :albums, :discogs_release_id
   end
