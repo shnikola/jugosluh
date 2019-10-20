@@ -10,8 +10,7 @@ port ENV.fetch("PORT") { 3000 }
 environment ENV.fetch("RAILS_ENV") { "development" }
 
 if ENV['RAILS_ENV'] == 'production'
-  app_dir = File.expand_path("../..", __FILE__)
-  shared_dir = "#{app_dir}/shared"
+  shared_dir = "/home/deploy/jugosluh/shared"
 
   # Set up socket location
   bind "unix://#{shared_dir}/tmp/sockets/puma.sock"
