@@ -1,6 +1,5 @@
 require "open-uri"
 require "watir-webdriver"
-require "watir-webdriver/wait"
 
 class Downloader
   module Domains
