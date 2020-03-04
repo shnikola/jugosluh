@@ -40,3 +40,7 @@ task deploy: :environment do
     end
   end
 end
+
+task console: :environment do
+  invoke :'console'
+end

@@ -4,4 +4,7 @@
       = image_tag album.image_url, class: 'album-image', alt: album.to_s
       .album-info
         .artist #{album.artist}
-        .title #{album.title} (#{album.year})
+        .title
+          #{album.title}
+          - if album.year
+            (#{album.year})

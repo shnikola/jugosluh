@@ -44,10 +44,11 @@ module DiscogsYu
   end
 
   def self.find_release_version_ids(master_id)
+    sleep(0.2) # TODO: make this smarter
     discogs.get_master_release_versions(master_id).versions.map(&:id)
   end
 
   def self.discogs
-    @@discogs ||= Discogs::Wrapper.new("Jugosluh", app_key: "IjTxrhRngvXjeNYPCuUa", app_secret: "kKiEXNKaZDuCroWaoHJZOIkDoWyQBYBn")
+    @@discogs ||= Discogs::Wrapper.new("Jugosluh", user_token: "PtqiuYmQWiQijrokVbRMbSTJXKTTBxAGgYgZHGyh")
   end
 end

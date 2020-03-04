@@ -16,7 +16,7 @@ class Cleaner
     albums.original.order("id DESC").each do |album|
       original = find_original(album)
       next if original.nil?
-      print "Duplicate #{album}, #{album.year} (#{album.id}) of #{original}, #{original.year} (#{original.id})".green
+      print "Duplicate #{album}, #{album.year} (#{album.id}) of #{original}, #{original.year} (#{original.id})\n".green
       if album.download_url?
         print "Already uploaded, not changing!\n".red
         next
@@ -90,7 +90,7 @@ class Cleaner
   end
 
   def clean_incomplete_sources(album_ids = nil)
-    print "\nCleaning incoplete sources...\n".on_blue
+    print "\nCleaning incomplete sources...\n".on_blue
     sources = album_ids ? Source.where(album_id: album_ids) : Source.all
     downloader = Downloader.new
     sources.download_incomplete.find_each do |source|

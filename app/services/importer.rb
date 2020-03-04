@@ -38,7 +38,7 @@ class Importer
     album = Album.non_discogs.find_by(label: label, catnum: catnum) if catnum != 'NONE'
     if album
       print "Connected to manually entered (#{album})...".light_blue
-      print "Track count different ".red if album.track_count != count_tracks(release.tracklist)
+      print "Track count different ".red if album.track_count && album.track_count != count_tracks(release.tracklist)
     end
 
     album ||= Album.find_by(discogs_release_id: release.id)
