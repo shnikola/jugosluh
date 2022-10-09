@@ -1,21 +1,19 @@
 .home-page
 
-  %section.stats
-    = homepage_progress_bar(@stats)
+  - if current_user&.upload_access?
+    %section.stats
+      = homepage_progress_bar(current_user.stats)
 
   %section.start-actions
     %h3 Slušaj:
-    = link_to "Tjedni paket", album_set_path("current"), class: 'pure-button pure-button-primary'
-
-    .or ili odaberi:
-
     - [50, 60, 70, 80].each do |d|
       = link_to "#{d}-te", albums_path(decade: d), class: 'tag-link'
     = link_to "pretraži sve", albums_path, class: 'tag-link highlighted'
 
     .or ili:
     = link_to "Daj što daš", random_albums_path, class: 'pure-button pure-button-primary'
-    = link_to "Upali Radio", radio_path, class: 'pure-button pure-button-primary'
+    - if current_user&.upload_access?
+      = link_to "Upali Radio", radio_path, class: 'pure-button pure-button-primary'
 
     = link_to "Settings", settings_path, class: 'settings-link'
 

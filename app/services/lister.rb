@@ -1,16 +1,8 @@
 class Lister
 
-  def list_unimported_catnums
-    sources = Source.unconnected.where("catnum IS NOT NULL")
-    grouped = sources.group_by{ |s| s.catnum.split("-").first }
-    grouped.sort_by{|k, v| -v.count}.select{|_, v| v.count > 4}.each do |k, v|
-      print "#{k} #{v.count}\n"
-    end
-  end
-
   def list_duplicate_catnums
     album_map = Hash.new([])
-    Album.original.maybe_in_yu.where("catnum != ?", 'NONE').find_each do |album|
+    Album.where("catnum != ?", 'NONE').find_each do |album|
       album_map[album.label + "#" + album.catnum] += [album]
     end
 
@@ -66,7 +58,7 @@ class Lister
   end
 
   def browse_missing_years
-    Album.maybe_in_yu.where("catnum != 'NONE'").group_by(&:label).each do |label, albums|
+    Album.where("catnum != 'NONE'").group_by(&:label).each do |label, albums|
       print "#{label}\n\n".red
       window_size = 7
       middle = window_size / 2
@@ -97,55 +89,5 @@ class Lister
       end
     end
   end
-
-  def browse_mismatched_sources
-    print "Total Mismatched: #{Source.download_mismatched.count}\n"
-    print "Total Incomplete: #{Source.download_incomplete.count}\n"
-    print "Total Unknown: #{Source.download_unknown.count}\n\n"
-    downloader = Downloader.new
-    Source.download_mismatched.find_each do |source|
-      print "#{source.title} :: #{source.album} (#{source.album.year})\n"
-      print "  Source ID: #{source.id}\n"
-      print "  Album ID: #{source.album_id} #{' (uploaded)' if source.album.uploaded?}\n"
-      print "  Track count: #{source.album.track_count}\n"
-      print "  URL: #{source.album.info_url}\n"
-
-      current_folder = "#{Rails.root}/tmp/downloads/#{downloader.folder_name(source)}"
-      `open #{current_folder}`
-      command = gets.strip
-      case command
-      when /^a/ # another album
-        album_id = command.split(":").last if command.include?(":")
-        source.update_attributes(album_id: album_id) if album_id
-        source.album.reload
-        downloader.check_downloaded(source, current_folder)
-      when /^c/ # create new album
-        _, label, catnum, artist, year, title, track_count = command.split(":")
-        album = Album.create(label: label, catnum: catnum, year: year, artist: artist, title: title, track_count: track_count, in_yu: 1)
-        source.update_attributes(album_id: album.id)
-        downloader.check_downloaded(source, current_folder)
-      when /^i/ # incomplete
-        source.download_incomplete!
-        FileUtils.mv(current_folder, "#{Rails.root}/tmp/downloads/#{downloader.folder_name(source)}")
-      when /^u/ # unknown
-        source.download_unknown!
-        source.update_attributes(album_id: nil)
-        FileUtils.mv(current_folder, "#{Rails.root}/tmp/downloads/#{downloader.folder_name(source)}")
-      when /^d/
-        source.compilation!
-        source.update_attributes(album_id: nil)
-        `rm -r #{current_folder}`
-      when /^n/ # skip
-        source.skipped!
-        source.update_attributes(album_id: nil)
-        `rm -r #{current_folder}`
-      when /^r/
-        source.confirmed!
-        source.update_attributes(album_id: nil)
-        `rm -r #{current_folder}`
-      end
-    end
-  end
-
 
 end

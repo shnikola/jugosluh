@@ -3,3 +3,6 @@
   .user-menu
     Prijavljen kao #{link_to current_user.name, current_user}.
     = link_to 'Odjavi se?', destroy_user_session_path
+- else
+  .user-menu
+    = link_to 'Login', new_user_session_path

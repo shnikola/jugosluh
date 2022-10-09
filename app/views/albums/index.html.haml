@@ -11,9 +11,10 @@
           Izdavač:
           = select_tag :label, options_for_select(Label.major, params[:label]), include_blank: 'Svi', class: 'autosubmit'
 
-        = label_tag :show_all do
-          = check_box_tag :show_all, "1", params[:show_all], class: 'autosubmit'
-          Prikaži i nesakupljene
+        - if current_user&.upload_access?
+          = label_tag :show_available do
+            = check_box_tag :show_available, "1", params[:show_available], class: 'autosubmit'
+            Prikaži samo dostupne
 
       %fieldset
         = text_field_tag :search, params[:search], placeholder: "Ime autora ili albuma"
@@ -25,7 +26,6 @@
         = label_tag :covers do
           = check_box_tag :covers, "1", params[:covers], class: 'autosubmit'
           Prikaži omote
-
 
   %section.albums
 

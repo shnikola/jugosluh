@@ -32,7 +32,7 @@ class DatabaseSync
     end
 
     p "Cleaning production database..."
-    ProductionAlbum.delete_all    
+    ProductionAlbum.delete_all
 
     p "Pushing to production..."
     production_albums.each_slice(1000) do |albums|
@@ -41,7 +41,6 @@ class DatabaseSync
   end
 
 end
-
 
 class ProductionAlbum < Album
   establish_connection(:production)

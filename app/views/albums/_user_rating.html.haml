@@ -2,5 +2,6 @@
   .rating{class: "r-#{user_rating.rating}"}= user_rating.rating
   .user= link_to user_rating.user, user_path(user_rating.user)
   .comment= simple_format(user_rating.comment)
-  .edit
-    = link_to "Promijeni", edit_user_rating_path(user_rating) if user_rating.user_id == current_user.id
+  - if current_user && current_user.id == user_rating.user_id
+    .edit
+      = link_to "Promijeni", edit_user_rating_path(user_rating)

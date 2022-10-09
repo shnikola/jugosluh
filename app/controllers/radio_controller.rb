@@ -4,7 +4,7 @@ class RadioController < ApplicationController
   end
 
   def next_track
-    albums = Album.of_interest.uploaded
+    albums = Album.uploaded
     albums = albums.from_decade(params[:decade]) if params[:decade].present?
     albums = albums.where(label: params[:label]) if params[:label].present?
     album = albums.random.first

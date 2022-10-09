@@ -15,7 +15,11 @@ module ApplicationHelper
   end
 
   def album_row_class(album)
-    "album-row #{album.uploaded? ? 'uploaded' : 'missing' } #{'listened' if album.user_ratings.any?{|ur| ur.user_id == current_user.id}}"
+    [
+      "album-row",
+      current_user&.upload_access? && !album.uploaded? ? "missing" : nil,
+      current_user && album.rated_by?(current_user.id) ? "listened" : nil,
+    ]
   end
 
   def decade_options
@@ -25,7 +29,6 @@ module ApplicationHelper
   def empty_gif
     "data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=="
   end
-
 
   def sortable(column, title = nil)
     title ||= column.titleize

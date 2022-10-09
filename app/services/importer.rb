@@ -2,124 +2,147 @@ require 'cyrillizer'
 
 class Importer
 
-  def start
-    imported = []
-    DiscogsYu.find_each do |release|
-      next if !import_release?(release)
-      album = import_release(release.id)
-      imported << album if album
-    end
-
-    Cleaner.new.after_import(imported.map(&:id))
-  end
-
-  def import_from_sources
-    Source.confirmed.unconnected.where("catnum LIKE 'EP-%'").each do |s|
-      label = "PGP RTB"
-      year = s.title.match(/(\d{4})/).try(:[], 1).try(:to_i) || s.details.match(/(\19d{2})/).try(:[], 1).try(:to_i)
-      title = s.title.split("-").last.titleize.strip
-      album = Album.where(catnum: s.catnum).first.try(:original)
-      album ||= Album.create(label: label, catnum: s.catnum, year: year, artist: s.artist.strip, title: title, in_yu: true)
-      s.update(album_id: album.id)
+  def start(year = nil)
+    DiscogsApi.new.search(year: year) do |record|
+      import_release(record)
     end
   end
 
+  def import_release(record)
+    # Ignore everything after 1.10.1991 - the closure of Jugoton.
+    return if record[:year].to_i > 1991
+    print "Importing #{record[:id]} [#{record[:title]}]... "
 
-  def import_release(release_id)
-    full_release = DiscogsYu.find_by_id(release_id)
-    print "Importing #{full_release.id} [#{full_release.title}]... " if full_release
-    save_to_db(full_release) if full_release
-  end
+    release = DiscogsRelease.find_by(id: record[:id])
 
-  def save_to_db(release)
-    label, catnum, original_catnum = select_label_info(release.labels)
+    # New release
+    if release.nil?
+      print "New release\n".light_blue
+      release = DiscogsRelease.create_from_discogs(record)
+      check_pending_release(release)
 
-    # Check by label+catnum if we have the same non-discogs album already in db
-    album = Album.non_discogs.find_by(label: label, catnum: catnum) if catnum != 'NONE'
-    if album
-      print "Connected to manually entered (#{album})...".light_blue
-      print "Track count different ".red if album.track_count && album.track_count != count_tracks(release.tracklist)
-    end
+    # Release still pending
+    elsif release.pending? && release.changed_from_discogs?(record)
+      print "Updating release\n".yellow
+      release.update_from_discogs(record)
+      check_pending_release(release)
 
-    album ||= Album.find_by(discogs_release_id: release.id)
-    album ||= Album.new(catnum: catnum, label: label)
+    # Confirmed release that has changed
+    elsif release.confirmed? && release.changed_from_discogs?(record)
+      print "Updating release\n".yellow
+      release.update_from_discogs(record)
+      update_album(release)
 
-    # Overwrite old catnum only if the discogs one has changed
-    if album.persisted? && album.discogs_catnum != original_catnum
-      album.catnum = catnum
-      print "Catnum Changed! ".red if album.catnum_changed?
-    end
-
-    album.year = release.year.to_i if release.year.to_i > 0
-
-    album.assign_attributes(
-      artist: select_artist_info(release.artists),
-      title: release.title.to_lat,
-      discogs_release_id: release.id,
-      discogs_master_id: release.master_id,
-      discogs_catnum: original_catnum,
-      info_url: release.uri,
-      image_url: select_image_url(release.images),
-      track_count: count_tracks(release.tracklist)
-    )
-
-    if album.new_record?
-      album.save
-      print "New album [#{album.id}].\n".green
     else
-      changes = album.changes.map{|k, v| "#{k}: #{v[0]} > #{v[1]}"}
-      album.save
-      print "Updated [#{album.id}] #{changes.join(', ')}\n".yellow
+      print "Skipping\n"
     end
+  end
 
-    album
+  def check_pending_release(release)
+    # Make sure all connected version are updated
+    update_master_versions(release.discogs_master_id) if release.discogs_master_id.present?
+
+    # Initialize potential album
+    album_fields = prepare_album_fields(release)
+
+    if duplicate_release?(release)
+      release.duplicate!
+      print "Detected as duplicate\n".yellow
+    elsif skippable_release?(album_fields)
+      release.skip!
+      print "Not in Yu, skipping.\n".yellow
+    elsif confirmed_release?(album_fields)
+      release.confirmed!
+      create_album(album_fields)
+    else
+      print "Not sure, leaving as pending\n".magenta
+    end
+  end
+
+  def create_album(album_fields)
+    unconnected_album = Album.find_by(discogs_release_id: nil, catnum: album_fields[:catnum])
+    if unconnected_album
+      unconnected_album.update(album_fields)
+      print "Unconnected album updated! ".green + printable_album_changes(unconnected_album) + "\n"
+    else
+      album = Album.create(album_fields)
+      print "New album confirmed! ".green + printable_album_changes(album) + "\n"
+    end
+  end
+
+  def update_album(release)
+    album = Album.find_by(discogs_release_id: release.id)
+    album.update(prepare_album_fields(release))
+    print "Updated [#{album.id}]: ".yellow + printable_album_changes(album) + "\n" if album.saved_changes?
   end
 
   private
 
-  def import_release?(release)
-    album = Album.find_by(discogs_release_id: release.id)
-    if album.nil?
-      true
-    elsif album.in_yu? == false
-      false # Skip re-import of non-yu albums
-    elsif !album.info_url.include?(release.uri)
-      true # Reimport if url (artist + title) changed
-    elsif album.image_url.nil? && release.thumb.present?
-      true # Reimport if image is missing
-    elsif album.year != release.year.to_i && release.year.to_i > 0
-      true # Reimport if year has changed
-    elsif album.discogs_catnum != release.catno
-      true # Reimport id catnum has changed
-    else
-      false
-    end
+  def prepare_album_fields(release)
+    full_record = DiscogsApi.new.get(release.id)
+    artist = full_record[:artists].map{|a| clean_artist_name(a) }.compact.join(", ")
+    best_label = full_record[:labels].find{|l| Label.major?(l[:name])} || full_record[:labels].first
+    best_image = full_record[:images].find{|i| i[:type] == 'primary'} || full_record[:images].first if full_record[:images]
+
+    {
+      title: full_record[:title].to_lat,
+      artist: artist,
+      label: Label.normalize(best_label[:name]),
+      catnum: Catnum.normalize(best_label[:catno]),
+      year: full_record[:year] == 0 ? nil : full_record[:year],
+      info_url: full_record[:uri],
+      image_url: best_image && best_image[:uri],
+      discogs_release_id: release.id,
+      track_count: count_tracks(full_record[:tracklist])
+    }
   end
 
-  def select_label_info(labels)
-    # In case of multiple, prefer known label
-    label = labels.find{|l| Label.major?(l.name)} || labels.first
-    return Label.normalize(label.name), Catnum.normalize(label.catno), label.catno
+  def update_master_versions(master_id)
+    version_ids = DiscogsApi.new.get_master_release_ids(master_id)
+    DiscogsRelease.where(id: version_ids).update_all(discogs_master_id: master_id) if version_ids.present?
   end
 
-  def select_artist_info(artists)
-    artist = artists.map{|a| [a.anv.presence || a.name, a.join || ""].join(" ")}.join(" ")
-    artist = artist.gsub(/\s+/, ' ').gsub(" ,", ",").gsub(/,\s?$/, '').strip.to_lat
+  def duplicate_release?(release)
+    release.discogs_master_id.present? && DiscogsRelease.where(
+      status: [:confirmed, :skip],
+      discogs_master_id: release.discogs_master_id,
+    ).where.not(id: release.id).exists?
   end
 
-  def select_image_url(images)
-    return nil if images.blank?
-    image = images.detect{|i| i.type == 'primary'} || images.first
-    image.uri if image
+  def skippable_release?(album_fields)
+    Label.foreign_series?(album_fields[:label], album_fields[:catnum]) || album_fields[:year].to_i > 1991
+  end
+
+  def confirmed_release?(album_fields)
+    Label.domestic_series?(album_fields[:label], album_fields[:catnum]) && album_fields[:year].present?
+  end
+
+  def clean_artist_name(artist)
+    name = (artist[:anv].presence || artist[:name]).to_lat
+    name.gsub!(/\(\d+\)/, '') # Remove Discogs (2) notations
+    name.squish!
+    name
   end
 
   def count_tracks(tracklist)
-    tracks = tracklist.select{ |t| t.type_ == "track" && t.title.present? }
+    tracks = tracklist.select{ |t| t[:type_] == "track" && t[:title].present? }
     if tracks.count == 0
-      tracks = tracklist.flat_map{ |t| t.sub_tracks }.compact
-      tracks = tracks.select{ |t| t.type_ == "track" && t.title.present? }
+      tracks = tracklist.flat_map{ |t| t[:sub_tracks] }.compact
+      tracks = tracks.select{ |t| t[:type_] == "track" && t[:title].present? }
     end
     tracks.count
+  end
+
+  def printable_album_changes(album)
+    album.saved_changes.map do |attr, values|
+      if attr.in?(['label', 'catnum'])
+        "#{attr}: #{values[0]} > #{values[1]}".red
+      elsif attr.in?(['title', 'artist', 'year', 'track_count'])
+        "#{attr}: #{values[0]} > #{values[1]}".yellow
+      else
+        attr.yellow
+      end
+    end.join(", ")
   end
 
 end

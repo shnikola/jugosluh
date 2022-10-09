@@ -10,8 +10,12 @@ class User < ApplicationRecord
     name
   end
 
-  def rated_album?(album)
-    user_ratings.where(album_id: album.id).exists?
+  def stats
+    {
+      found: Album.count,
+      uploaded: Album.uploaded.count,
+      listened: user_ratings.count,
+    }
   end
 
 end

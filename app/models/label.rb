@@ -12,13 +12,13 @@ class Label
     ALIASES[label.downcase] || major.find{|l| label.casecmp(l).zero? } || label
   end
 
-  def self.domestic?(label, catnum)
-    prefixes = Label::MAJOR_LABEL_PREFIXES[label].try(:[], :domestic)
+  def self.foreign_series?(label, catnum)
+    prefixes = Label::MAJOR_LABEL_PREFIXES.dig(label, :foreign)
     prefixes.present? ? prefixes.any?{|p| prefix_match?(p, catnum) } : false
   end
 
-  def self.foreign?(label, catnum)
-    prefixes = Label::MAJOR_LABEL_PREFIXES[label].try(:[], :foreign)
+  def self.domestic_series?(label, catnum)
+    prefixes = Label::MAJOR_LABEL_PREFIXES.dig(label, :domestic)
     prefixes.present? ? prefixes.any?{|p| prefix_match?(p, catnum) } : false
   end
 

@@ -8,24 +8,17 @@ gem 'puma'
 gem 'mysql2'
 
 gem 'devise', '>= 4.7.1'
-
-gem 'sprockets', '< 4.0'
-gem 'sass-rails'
-gem 'uglifier', '>= 1.3.0'
-gem 'haml'
-gem 'colorize'
-
-# gem 'jquery-rails'
-
-gem "discogs-wrapper"
-gem "google-api-client"
-gem "nokogiri"
 gem 'kaminari'
+
+gem 'sassc-rails'
+gem 'terser'
+gem 'haml'
+gem 'jquery-rails'
+
+gem "http"
 gem 'cyrillizer'
 gem 'activerecord-import'
-gem 'open_uri_redirections'
-
-gem 'watir', '~> 6.0'
+gem 'colorize'
 
 group :development do
   gem 'mina', require: false
