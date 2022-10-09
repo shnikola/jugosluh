@@ -1,5 +1,5 @@
 class UserRatingsController < ApplicationController
-  before_action :authenticate_user!
+  before_action :authenticate_user!, raise: false
 
   def create
     @rating = current_user.user_ratings.create(user_rating_params)
