@@ -2,12 +2,12 @@ module ApplicationHelper
 
   def homepage_progress_bar(stats)
     bar = content_tag(:div, class: 'bar') do
-      content_tag(:div, nil, class: 'uploaded', style: "width: #{100.0*stats[:uploaded]/stats[:found]}%;") +
+      content_tag(:div, nil, class: 'available', style: "width: #{100.0*stats[:available]/stats[:found]}%;") +
       content_tag(:div, nil, class: 'listened', style: "width: #{100.0*stats[:listened]/stats[:found]}%;")
     end
     legend = content_tag(:div, class: 'legend') do
       "Poslušano #{ number_with_delimiter stats[:listened] } /
-       Sakupljeno #{ number_with_delimiter stats[:uploaded] } /
+       Dostupno #{ number_with_delimiter stats[:available] } /
        Pronađeno #{ number_with_delimiter stats[:found] }"
      end
 

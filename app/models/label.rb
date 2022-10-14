@@ -75,11 +75,60 @@ class Label
       ]
     },
 
-    "PGP RTB" => { # TODO
-      #   catnum =~ /(^111)|(^112)|(^15)|(^20)|(^21)|(^23)|(^31)|(^40)|(^41)|(^50)|(^51)|(^80)|(^EP-1)|(^EP-50)|(^EP-6)|(^LP-1)|(^LP-6)|(^NK-)|(^S-1)|(^S-51)|(^S-52)|(^S-6)|(^SF-)/
-      # https://rateyourmusic.com/list/RockyRock369
-      domestic: [],
-      foreign: []
+    "PGP RTB" => {
+      # (^LP-1)
+      # (^LP-6)
+      domestic: [
+        "111",   # Singles
+        "112",   # Singles
+        "152",
+        /^20\d/, # Late 80s turbofolk
+        "230",
+        "231",
+        "250",   # Children's
+        "251",   # Instrumentals
+        "252",   # LPS
+        "31",
+        "400",
+        "410",
+        "50",
+        "51",
+        "800",
+        "EP-11",
+        "EP-12",
+        "EP-14", # Kola
+        "EP-16", # Albanian
+        "EP-17",
+        "EP-20",
+        "EP-22",
+        "EP-26",
+        "EP-41",
+        "EP-50",
+        "EP-60", # Children stories
+        "EP-61", # Children stories
+        "EP-65", # Children songs
+        "NK-",
+        "LP-0",
+        "LP-1",
+        "LP-2",  # Orchestral
+        "S-10",
+        "S-13",
+        "S-51",
+        "S-52",
+        "S-61", # Children choirs
+        "SF-13",
+        "SF-52",
+      ],
+      foreign: [
+        "222", # LPs
+        "223", # Orcherstral
+        "32",
+        "42",
+        "52",
+        "57",
+        "S-53",
+        "S-54",
+      ]
     },
 
     "Diskos" => {

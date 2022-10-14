@@ -2,7 +2,7 @@ class AlbumsController < ApplicationController
 
   def index
     @albums = Album.includes(:user_ratings)
-    @albums = @albums.uploaded if params[:show_available].present?
+    @albums = @albums.available(current_user) if params[:show_available].present?
     @albums = @albums.search(params[:search]) if params[:search].present?
     @albums = @albums.from_decade(params[:decade]) if params[:decade].present?
     @albums = @albums.where(label: params[:label]) if params[:label].present?
@@ -23,7 +23,7 @@ class AlbumsController < ApplicationController
   private
 
   def random_albums
-    albums = Album.uploaded.random
+    albums = Album.available(current_user).random
     albums = albums.where(label: session[:whitelist_labels]) if session[:whitelist_labels].present?
     albums = albums.where.not(id: current_user.user_ratings.pluck(:album_id)) if current_user
     albums

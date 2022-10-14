@@ -21,7 +21,7 @@ class DiscogsRelease < ApplicationRecord
   end
 
   def labels=(value)
-    write_attribute(:labels, value&.join(";;"))
+    write_attribute(:labels, value.to_a.uniq.first(10).join(";;"))
   end
 
   private

@@ -5,6 +5,14 @@ class Album < ApplicationRecord
   scope :uploaded, -> { where("download_url IS NOT NULL") }
   scope :with_cover, -> { where.not(image_url: nil) }
 
+  def self.available(user)
+    if user&.upload_access?
+      where("download_url IS NOT NULL OR spotify_id IS NOT NULL")
+    else
+      where("spotify_id IS NOT NULL")
+    end
+  end
+
   def self.random
     order("RAND()")
   end
@@ -28,6 +36,10 @@ class Album < ApplicationRecord
 
   def uploaded?
     download_url.present?
+  end
+
+  def spotify_url
+   "https://open.spotify.com/album/#{spotify_id}" if spotify_id.present?
   end
 
   def rated_by?(user_id)

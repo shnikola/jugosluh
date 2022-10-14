@@ -13,7 +13,7 @@ class User < ApplicationRecord
   def stats
     {
       found: Album.count,
-      uploaded: Album.uploaded.count,
+      available: Album.available.count,
       listened: user_ratings.count,
     }
   end

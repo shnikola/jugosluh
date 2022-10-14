@@ -5,3 +5,4 @@
   - if current_user && current_user.id == user_rating.user_id
     .edit
       = link_to "Promijeni", edit_user_rating_path(user_rating)
+      = link_to "Obriši", user_rating_path(user_rating), method: :delete, data: { confirm: "Sigurno?" }

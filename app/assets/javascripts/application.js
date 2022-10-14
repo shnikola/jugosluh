@@ -1,4 +1,5 @@
 //= require jquery
+//= require rails-ujs
 //= require player
 //= require radio
 

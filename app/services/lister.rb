@@ -9,6 +9,7 @@ class Lister
     album_map.select!{|_, v| v.count > 1}
     album_map.values.each do |albums|
       albums.each { |a| print "[#{a.label} #{a.catnum}] #{a.artist} - #{a.title}\n"}
+      print "Discogs: " + albums.map{|a| a.discogs_release_id }.join(", ") + "\n"
       print "\n"
     end
   end
@@ -16,7 +17,7 @@ class Lister
   def list_collected_catnums
     total = Hash.new { |h, k| h[k] = { count: 0, estimated: 0} }
     Label::MAJOR_LABEL_PREFIXES.each do |label, prefixes|
-      print "#{label}".on_red
+      print "====================== #{label} ======================".on_red
       print "\n\n"
       catnums = Album.where(label: label).pluck(:catnum).flat_map{|c| c.split(";")}.uniq
       prefixes[:domestic].each do |prefix|
@@ -36,6 +37,7 @@ class Lister
         end
         total[label][:count] += prefix_catnums.count
         total[label][:estimated] += prefix_estimated_total
+        print "\n"
         print "Collected #{prefix_catnums.count}/#{prefix_estimated_total} (#{(100.0 * prefix_catnums.count / prefix_estimated_total).round(2)}%)".on_blue
         print "\n\n"
       end

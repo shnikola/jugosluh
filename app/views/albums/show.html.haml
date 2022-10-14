@@ -13,6 +13,8 @@
       - if current_user&.upload_access?
         = button_tag "Play", type: 'button', class: 'play-button pure-button pure-button-primary' if @album.tracklist?
         = link_to "Open", @album.download_url, data: {popup: true}, class: 'pure-button' if @album.download_url
+      - if @album.spotify_url
+        = link_to "Spotify", @album.spotify_url, target: "_blank", class: 'pure-button pure-button-success'
 
       .minor-links
         =link_to "Dodaj na listu", new_user_list_album_path(album_id: @album.id)
@@ -33,5 +35,5 @@
     - @album.user_ratings.includes(:user).order("created_at").each do |user_rating|
       = render partial: 'albums/user_rating', object: user_rating
 
-    - if current_user && @album.rated_by?(current_user.id)
+    - if current_user && !@album.rated_by?(current_user.id)
       = render 'rating_form'

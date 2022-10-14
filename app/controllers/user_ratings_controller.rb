@@ -18,6 +18,13 @@ class UserRatingsController < ApplicationController
     redirect_to album_url(@rating.album_id)
   end
 
+  def destroy
+    @rating = current_user.user_ratings.find(params[:id])
+    @rating.destroy
+    @rating.album.calculate_average_rating
+    redirect_to album_url(@rating.album_id)
+  end
+
   private
 
   def user_rating_params

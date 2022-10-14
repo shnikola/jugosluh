@@ -16,3 +16,7 @@ https://behindtheironcurtainmusic.blogspot.com/
 https://www.smboemi.com
 https://yukebox.blogspot.hr
 https://yugojazz.blogspot.com
+
+## Catalogs
+
+https://rateyourmusic.com/list/RockyRock369
