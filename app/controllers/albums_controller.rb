@@ -17,7 +17,7 @@ class AlbumsController < ApplicationController
   end
 
   def random
-    redirect_to random_albums.first
+    redirect_to random_albums.first || Album.random.first
   end
 
   private

@@ -1,10 +1,10 @@
 source 'https://rubygems.org'
 
-ruby '2.6.5'
+ruby '3.3.6'
 
-gem 'rails', '~> 5.2.0'
-
+gem 'rails', '~> 7.2.0'
 gem 'puma'
+gem 'bootsnap'
 gem 'mysql2'
 
 gem 'devise', '>= 4.7.1'
