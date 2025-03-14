@@ -1,13 +1,11 @@
-# Change to match your CPU core count
 workers 1
+threads 1, 3
 
-# Min and Max threads per worker
-threads 1, 6
+preload_app!
 
-# Specifies the `port` that Puma will listen on to receive requests, default is 3000.
+rackup      'config.ru'
+environment ENV['RACK_ENV'] || 'development'
 port ENV.fetch("PORT") { 3000 }
-
-environment ENV.fetch("RAILS_ENV") { "development" }
 
 if ENV['RAILS_ENV'] == 'production'
   shared_dir = "/home/deploy/jugosluh/shared"
@@ -25,10 +23,4 @@ if ENV['RAILS_ENV'] == 'production'
   activate_control_app
 
   plugin :tmp_restart
-end
-
-preload_app!
-
-on_worker_boot do
-  ApplicationRecord.establish_connection
 end
