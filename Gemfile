@@ -3,6 +3,7 @@ source 'https://rubygems.org'
 ruby '4.0.5'
 
 gem 'rails', '~> 7.2.0'
+gem 'json', '< 3' # Until rails is upgraded to support json 3
 gem 'puma'
 gem 'bootsnap'
 gem 'mysql2'
