@@ -1,46 +1,46 @@
-require 'mina/bundler'
-require 'mina/rails'
-require 'mina/git'
-require 'mina/rbenv'
-require 'mina/systemd'
+lock '~> 3.20'
 
-set :domain, 'utorkom' # Hostname to SSH to
-set :port, 20022
-set :deploy_to, '/home/deploy/jugosluh'
-set :repository, 'https://github.com/shnikola/jugosluh.git'
+set :application, 'jugosluh'
+set :repo_url, 'https://github.com/shnikola/jugosluh.git'
 set :branch, 'master'
+set :deploy_to, '/home/deploy/jugosluh'
 set :rails_env, 'production'
-set :user, 'deploy'
+set :keep_releases, 5
 
-set :shared_dirs, fetch(:shared_dirs, []).push('tmp/pids', 'tmp/sockets')
-set :shared_files, fetch(:shared_files, []).push('.rbenv-vars')
+set :rbenv_type, :user
+set :rbenv_ruby, File.read(File.expand_path('../.ruby-version', __dir__)).strip
 
-task :environment do
-  invoke :'rbenv:load'
-end
+# Reuse the gem directory mina installed into
+set :bundle_path, -> { shared_path.join('vendor/bundle') }
 
-task setup: :environment do
-  command %[touch "#{fetch(:shared_path)}/.rbenv-vars"]
-  command %[chmod g+rx,u+rwx "#{fetch(:shared_path)}/.rbenv-vars"]
-  comment %{Be sure to set all ENV variables in #{fetch(:shared_path)}/.rbenv-vars}
-end
+append :linked_dirs, 'log', 'tmp/cache', 'tmp/pids', 'tmp/sockets', 'public/assets'
+append :linked_files, '.rbenv-vars'
 
-desc "Deploys the current version to the server."
-task deploy: :environment do
-  deploy do
-    invoke :'git:clone'
-    invoke :'deploy:link_shared_paths'
-    invoke :'bundle:install'
-    invoke :'rails:db_migrate'
-    invoke :'rails:assets_precompile'
-    invoke :'deploy:cleanup'
-
-    on :launch do
-      invoke :'systemctl:restart', 'jugosluh-puma'
+namespace :deploy do
+  desc 'Create shared .rbenv-vars file'
+  task :setup do
+    on roles(:app) do
+      execute :mkdir, '-p', shared_path
+      execute :touch, shared_path.join('.rbenv-vars')
+      execute :chmod, 'g+rx,u+rwx', shared_path.join('.rbenv-vars')
+      info "Be sure to set all ENV variables in #{shared_path}/.rbenv-vars"
     end
   end
+
+  desc 'Restart puma'
+  task :restart do
+    on roles(:app) do
+      execute :sudo, :systemctl, :restart, 'jugosluh-puma'
+    end
+  end
+
+  after :publishing, :restart
 end
 
-task console: :environment do
-  invoke :'console'
+desc 'Open a Rails console on the server'
+task :console do
+  on roles(:app), in: :sequence do |host|
+    cmd = "cd #{current_path} && ~/.rbenv/bin/rbenv exec bundle exec rails console -e #{fetch(:rails_env)}"
+    exec %(ssh -t -p #{host.port} #{host.user}@#{host.hostname} "#{cmd}")
+  end
 end
